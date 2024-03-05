@@ -1,0 +1,13 @@
+name = "CoordinatesSystems"
+uuid = "46fde914-2a1c-4f77-9b2f-1c21d94fe0f1"
+authors = ["Jerome Guterl"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
