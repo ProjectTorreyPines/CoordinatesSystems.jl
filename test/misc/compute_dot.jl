@@ -1,4 +1,4 @@
-struct MethodDivergence{O<:GridType} end
+struct MethodDivergence{O<:GridOrthonogality} end
 MethodDivergence(::Grid{O}) where {O} = MethodDivergence{O}()
 
 get_method_div(method) = MethodDivergence

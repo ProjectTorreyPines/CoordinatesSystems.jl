@@ -1,4 +1,4 @@
-struct MethodDivergence{O<:GridType} end
+struct MethodDivergence{O<:GridOrthonogality} end
 MethodDivergence(::Grid{O}) where {O} = MethodDivergence{O}()
 
 get_method_div(method) = MethodDivergence
@@ -18,7 +18,8 @@ sdoc(c::ComputeDivergence{E,G,I,MethodDivergence{O}}) where {O,E,G,I} = "compute
 @compute_func compute!(cd::ComputeDivergence, args...) = compute_div_ortho!(cd.eq, cd.eq.flux.tot, cd.grid, cd.iter, args...)
 compute_div_ortho!(eq, tot_flux, grid, iter, args...) = compute_div_ortho!(eq.trsp, tot_flux.n.x, tot_flux.e.y, grid.σ.n.x, grid.σ.e.y, grid.σ.s.x, grid.σ.w.y, iter, args...)
 
-Base.@kwdef mutable struct ComputeDivergenceConfig <: ComputeConfig{ComputeDivergence} b                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+Base.@kwdef mutable struct ComputeDivergenceConfig <: ComputeConfig{ComputeDivergence}
+    b
     eq::Union{Symbol,Missing} = missing
     active::Bool = true
 end

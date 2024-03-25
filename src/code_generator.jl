@@ -45,24 +45,126 @@ end
 
 macro add_coordinate_type(name)
     !(generate_coordinate_systems) && return
-    name_component = Symbol(string(name) * "Component")
-    name_coordinate = Symbol(string(name) * "Coordinate")
-    sname_component_field = lowercase(string(name))
-    sname_coordinate_field = lowercase(string(name))
+    name_component = name * "Component"
+    name_coordinate = name * "Coordinate"
+    name_component_field = Symbol(lowercase(string(name)))
+    name_coordinate_field = Symbol(lowercase(string(name)))
     ex = quote
-        $name_component = Component{Symbol($(sname_component_field))}
-        $name_coordinate = Coordinate{Symbol($(sname_coordinate_field))}
-        get_component_name(::$name_component) = Symbol($(sname_component_field))
-        get_coordinate_name(::$name_coordinate) = Symbol($(sname_coordinate_field))
-        get_component_name(::Type{<:$name_component}) = Symbol($(sname_component_field))
-        get_coordinate_name(::Type{<:$name_coordinate}) = Symbol($(sname_coordinate_field))
+        struct $name_component{T} <: Component{T}
+            s::Symbol
+        end 
+        struct $name_coordinate{T} <: Coordinate{T}
+            s::Symbol
+        end
+        
+        get_component_name(::$name_component) = $(QuoteNode(name_component_field))
+        get_coordinate_name(::$name_coordinate) = $(QuoteNode(name_coordinate_field))
+        get_component_name(::Type{<:$name_component}) = $(QuoteNode(name_component_field))
+        get_coordinate_name(::Type{<:$name_coordinate}) = $(QuoteNode(name_coordinate_field))
         #name(::Type{$name}) = $sfieldname
         #name(::$name) = $sfieldname
+        $name_component(args...) = $name_component{Generic}(args...)
+        $name_coordinate(args...) = $name_coordinate{Generic}(args...) 
+        $name_coordinate{T}() where {T} = $name_coordinate{T}($(QuoteNode(name_coordinate_field)))
+        $name_component{T}() where {T} = $name_component{T}($(QuoteNode(name_component_field)))
+        (c::$name_component{T})(E::Type) where {T} = $name_component{E}
+        (c::$name_coordinate{T})(E::Type) where {T} = $name_coordinate{E}
         export $name_component, $name_coordinate
     end
     _write_coordinate_systems(ex)
     return
 end
+
+function add_vectortype(blk,name, kwargs,s::String)
+    push!(blk.args, :(abstract type $(Symbol(s)){E1,E2,E3,S} <: $(Symbol("Abstract" * s)){S} end))
+    pp = [:E1, :E2, :E3]
+    fields = [(k,p) for ((k, v), p) in zip(kwargs, pp)]
+    sfields = [k for ((k, v), p) in zip(kwargs, pp)]
+    struct_dic = Dict(
+        :constructors => Any[],
+        :mutable => false,
+        :params => pp,
+        :name => name*s,
+        :fields => fields,
+        :supertype => Expr(:curly, Symbol(s), :E1,:E2,:E3,name)
+    )
+    push!(blk.args, MacroTools.combinestructdef(struct_dic))
+    push!(blk.args, :($(Symbol(s)){$name}($(sfields...))= $(name * s)($(sfields...))))
+    push!(blk.args, :((e::$(name * s))(a, b, c) = compute!(e,a,b,c)))
+
+end
+
+
+
+
+cfields = [1,2,3]
+function make_scalar_product!(blk)
+    f1 = copy(cfields)
+    f2 = copy(cfields)
+
+    f_iter = Iterators.product(f1, f2)
+    i_iter = Iterators.product(eachindex(f1), eachindex(f2))
+
+    G = Array{Any}(undef, 3, 3)
+    dims = [(2, 3), (1, 2)]
+    index_field = Dict()
+    index_grid = Dict()
+    index_args = Dict()
+    index_field[1] = [:i, :s]
+    index_field[3] = [:i, :j, :s]
+    index_field[2] = [:i, :s]
+    index_grid[2] = [:i, :j]
+    index_grid[1] = [:i]
+    index_args[1] = [:(i::Int64)]
+    index_args[2] = [:(i::Int64), :(s::Int64)]
+    index_args[3] = [:(i::Int64), :(j::Int64), :(s::Int64)]
+
+    GG = [:(UArray{N}), :Missing]
+    for (G11, G12, G13, G22, G23, G33) in Iterators.product(GG, GG, GG, GG, GG, GG)
+        G[1, 1] = G11
+        G[2, 1] = G12
+        G[1, 2] = G12
+        G[2, 2] = G22
+        G[2, 3] = G23
+        G[3, 3] = G33
+        G[3, 2] = G23
+        G[3, 1] = G13
+        G[1, 3] = G13
+        get_symbol(f1,f2) = (Symbol("v" * string(f1) * string(f2)))
+        args = [:(getfield(v1, $(f[1]))[index...] * getfield(v2, $(f[1]))[index...] * getfield(getfield(g, $(f[1])), $(f[2]))[index...]) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
+          args2 = [:(getfield($(get_symbol(f[1], f[2])), $(f[1]))[index...] * getfield($(get_symbol(f[2], f[1])), $(f[1]))[index...] * getfield(getfield(g, $(f[1])), $(f[2]))[index...]) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
+       if length(args) > 0
+        push!(blk.args, :(⋅(v1::ComponentVector{U,U,U,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{G11,G12,G13,G22,G23,G33,S2,S1}, index::Vararg{Int64,N}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(⋅(v11::U, v12::U, v13::U, v21::T, v22::T, v33::T, g::BasisChangeTensor{G11,G12,G13,G22,G23,G33,S2,S1}, index::Vararg{Int64,N}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},T<:UArray{N},S1,S2} = $(length(args2) > 1 ? Expr(:call, :+, args2...) : args2[1])))
+
+        end
+        args = [:(getfield(v1, $(f[1])) .* getfield(v2, $(f[1])) .* getfield(getfield(g,$(f[1])),$(f[2]))) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
+        args2 = [:(getfield($(get_symbol(f[1], f[2])), $(f[1])) .* getfield($(get_symbol(f[2], f[1])), $(f[1])) .* getfield(getfield(g, $(f[1])), $(f[2]))) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
+
+        if length(args) > 0
+        push!(blk.args, :(⋅(v1::ComponentVector{U,U,U,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{$G1,$G2,$G3,S1,S2}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = @views  $(length(args) > 1 ? Expr(:call, :.+, args...) : args[1])))
+            push!(blk.args, :(⋅(v11::U, v12::U, v13::U, v21::T, v22::T, v33::T, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,S2,S1}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},T<:UArray{N}, S1,S2} = @views  $(length(args2) > 1 ? Expr(:call, :.+, args2...) : args2[1])))
+        end     
+    end
+
+    GG = [:Float64, :Missing]
+    for (G11, G12, G13, G22, G23, G33) in Iterators.product(GG, GG, GG, GG, GG, GG)
+        G[1, 1] = G11
+        G[2, 1] = G12
+        G[1, 2] = G12
+        G[2, 2] = G22
+        G[2, 3] = G23
+        G[3, 3] = G33
+        G[3, 2] = G23
+        G[3, 1] = G13
+        G[1, 3] = G13
+        args = [:(getfield(v1, $(f[1])) * getfield(v2, $(f[1])) * getfield(getfield(g, $(f[1])), $(f[2]))) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
+        if length(args) > 0
+            push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{G$11,$G12,$G13,$G22,$G23,$G33,S2,S1}) where {G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:Real,T<:Real,S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+        end
+    end
+end
+
 
 macro add_coordinate_system(args...)
     !(generate_coordinate_systems) && return
@@ -81,35 +183,29 @@ macro add_coordinate_system(args...)
         :supertype => :CoordinateSystem
     )
     push!(blk.args, MacroTools.combinestructdef(struct_dic_cs))
-    
+    push!(blk.args, :(export $name))
+    push!(blk.args, :($name() = $name((T() for T in fieldtypes($name))...)))
     # vector
-    pp = [:E1, :E2, :E3]
-    fields = [(k, p) for ((k,v), p) in zip(kwargs,pp)]
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name*"PhysicsComponentVector",
-        :fields => fields,
-        :supertype => Expr(:curly, :PhysicsComponentVector, :E1,:E2,:E3,name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(PhysicsComponentVector{$name}(args...) = $(name * "PhysicsComponentVector")(args...)))
     
-    # coordinates
-    pp = [:C1, :C2, :C3]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => [:C1,:C2,:C3],
-        :name => name * "PhysicsCoordinates",
-        :fields => fields,
-        :supertype => Expr(:curly, PhysicsCoordinates, :C1, :C2, :C3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(PhysicsCoordinates{$name}(args...) = $(name * "PhysicsCoordinates")(args...)))
-
+    add_vectortype(blk, name, kwargs, "PhysicsComponentVector")
+    add_vectortype(blk, name, kwargs, "PhysicsComponentVectors")
+    add_vectortype(blk, name, kwargs, "PhysicsCoordinates")
+    add_vectortype(blk, name, kwargs, "NormalizationMetric")
+    add_vectortype(blk, name, kwargs, "BasisVector")
+    add_vectortype(blk, name, kwargs, "UnitBasisVector")
+    add_vectortype(blk, name, kwargs, "RightContraction")
+    add_vectortype(blk, name, kwargs, "BasisVectors")
+    add_vectortype(blk, name, kwargs, "UnitBasisVectors")
+    add_vectortype(blk, name, kwargs, "DyadicTensor")
+    add_vectortype(blk, name, kwargs, "DyadicTensorComponent")
+    add_vectortype(blk, name, kwargs, "BasisChangeComponent")
+    add_vectortype(blk, name, kwargs, "MetricTensorComponent")
+    add_vectortype(blk, name, kwargs, "TensorComponent")
+    add_vectortype(blk, name, kwargs, "MetricTensor")
+    add_vectortype(blk, name, kwargs, "Tensor")
+    add_vectortype(blk, name, kwargs, "DiagonalTensor")
+    
+    
     # generic operator
     pp = [:C1, :C2, :C3]
     fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
@@ -127,207 +223,8 @@ macro add_coordinate_system(args...)
     push!(blk.args, :($(name * "ComponentOperator"){O}(v1::V1, v2::V2, v3::V3) where {O,V1,V2,V3} = $(name * "ComponentOperator"){V1,V2,V3,O}(v1, v2, v3)))
 
     # normalization metric 
-    pp = [:H1, :H2, :H3]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name * "NormalizationMetric",
-        :fields => fields,
-        :supertype => Expr(:curly, :NormalizationMetric, :H1, :H2, :H3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(NormalizationMetric{$name}(args...; kw...) = $(name * "NormalizationMetric")(args...; kw...)))
-    # basis vector
-    pp = [:E1, :E2, :E3]
-    fields = [(k, p) for ((k,v), p) in zip(kwargs,pp)]
-    pp_ = pp
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp_,
-        :name => name*"BasisVector",
-        :fields => fields,
-        :supertype => Expr(:curly, :BasisVector, :E1,:E2,:E3,name)
-    )
+
     
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(BasisVector{$name}(args...; kw...) = $(name * "BasisVector")(args...; kw...)))
-    push!(blk.args, :($(name * "BasisVector")(arr_gen::ArrayGenerator) = $(name * "BasisVector")(arr_gen(;i_component=1), arr_gen(;i_component=2), arr_gen(;i_component=3))))
-    
-    # unit basis vector
-    pp = [:E1, :E2, :E3]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    pp_ = pp
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp_,
-        :name => name * "UnitBasisVector",
-        :fields => fields,
-        :supertype => Expr(:curly, :UnitBasisVector, :E1, :E2, :E3, name)
-    )
-
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(UnitBasisVector{$name}(args...; kw...) = $(name * "UnitBasisVector")(args...; kw...)))
-    push!(blk.args, :($(name * "UnitBasisVector")(arr_gen::ArrayGenerator) = $(name * "UnitBasisVector")(arr_gen(; i_component=1), arr_gen(; i_component=2), arr_gen(; i_component=3))))
-
-    # right contraction
-    pp = [:E1, :E2, :E3]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    pp_ = pp
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp_,
-        :name => name * "RightContraction",
-        :fields => fields,
-        :supertype => Expr(:curly, :RightContraction, :E1, :E2, :E3, name)
-    )
-
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(RightContraction{$name}(args...; kw...) = $(name * "RightContraction")(args...; kw...)))
-    # basis vectors
-    pp = [:V1, :V2, :V3]
-    #pp = [:($(name * "BasisVector"){T,T,T}), :($(name * "BasisVector"){T,T,T}), :($(name * "BasisVector"){T,T,T})]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    pp_ = pp
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name * "BasisVectors",
-        :fields => fields,
-        :supertype => Expr(:curly, :BasisVectors, :V1, :V2, :V3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(BasisVectors{$name}(args...; kw...) = $(name * "BasisVectors")(args...; kw...)))
-    push!(blk.args, :((e::$(name * "BasisVectors"))(a::T, b::T, c::T) where T = sum(d * getproperty(e, fn) for (d, fn) in zip((a,b,c), propertynames(e)))))
-
-    # unit basis vectors
-    pp = [:V1, :V2, :V3]
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    pp_ = pp
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name * "UnitBasisVectors",
-        :fields => fields,
-        :supertype => Expr(:curly, :UnitBasisVectors, :V1, :V2, :V3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(UnitBasisVectors{$name}(args...; kw...) = $(name * "UnitBasisVectors")(args...; kw...)))
-    push!(blk.args, :((e::$(name * "UnitBasisVectors"))(a::T, b::T, c::T) where {T} = sum(d * getproperty(e, fn) for (d, fn) in zip((a, b, c), propertynames(e)))))
-
-    #  DyadicTensor
-    pp = [:D1, :D2, :D3]
-
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name * "DyadicTensor",
-        :fields => fields,
-        :supertype => Expr(:curly, :DyadicTensor, :D1, :D2, :D3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(DyadicTensor{$name}(args...; kw...) = $(name * "DyadicTensor")(args...; kw...)))
-
-    # DyadicTensorComponent
-    pp = [:D1, :D2, :D3]
-
-    fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :params => pp,
-        :name => name * "DyadicTensorComponent",
-        :fields => fields,
-        :supertype => Expr(:curly, :DyadicTensorComponent, :D1, :D2, :D3, name)
-    )
-
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(DyadicTensorComponent{$name}(args...; kw...) = $(name * "DyadicTensorComponent")(args...; kw...)))
-
- 
-    # basis change component
-    pp = [:B1, :B2, :B3]
-    pp_ = copy(pp)
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :name => name * "BasisChangeComponent",
-        :params => pp_,
-        :fields => [(f[1], p) for (f, p) in zip(fields, pp)],
-        :supertype => Expr(:curly, :BasisChangeComponent, :B1, :B2, :B3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(BasisChangeComponent{$(name)}(args...; kw...)= $(name * "BasisChangeComponent")(args...; kw...)))
-    # metric tensor component
-    pp = [:G1, :G2, :G3]
-    #push!(pp, cs1[:name])
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :name => name * "MetricTensorComponent",
-        :params => pp,
-        :fields => [(f[1], p) for (f, p) in zip(fields, pp)],
-        :supertype => Expr(:curly, :MetricTensorComponent, :G1, :G2, :G3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(MetricTensorComponent{$(name)}(args...; kw...) = $(name * "MetricTensorComponent")(args...; kw...)))
-
-    # metric tensor component
-    pp = [:G1, :G2, :G3]
-    #push!(pp, cs1[:name])
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :name => name * "TensorComponent",
-        :params => pp,
-        :fields => [(f[1], p) for (f, p) in zip(fields, pp)],
-        :supertype => Expr(:curly, :TensorComponent, :G1, :G2, :G3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(TensorComponent{$(name)}(v1::V1,v2::V2,v3::V3) where {V1,V2,V3} = $(name * "TensorComponent")(v1,v2,v3)))
-
-
-    # metric tensor
-    pp = [:G1, :G2, :G3]
-    pt = [name * "MetricTensorComponent", name * "MetricTensorComponent", name * "MetricTensorComponent"]
-    pp_ = [:($p<:$t) for (p,t) in zip(pp,pt)]
-    #push!(pp, cs1[:name])
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :name => name * "MetricTensor",
-        :params => pp_,
-        :fields => [(f[1], p) for (f, p) in zip(fields, pp)],
-        :supertype => Expr(:curly, :MetricTensor, :G1, :G2, :G3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(MetricTensor{$(name)}(args...; kw...) = $(name  * "MetricTensor")(args...; kw...)))
-
-    # metric tensor
-    pp = [:G1, :G2, :G3]
-    pt = [name * "TensorComponent", name * "TensorComponent", name * "TensorComponent"]
-    pp_ = [:($p <: $t) for (p, t) in zip(pp, pt)]
-    #push!(pp,:N)
-    struct_dic = Dict(
-        :constructors => Any[],
-        :mutable => false,
-        :name => name * "Tensor",
-        :params => pp_,
-        :fields => [(f[1], p) for (f, p) in zip(fields, pp)],
-        :supertype => Expr(:curly, Tensor, :G1, :G2, :G3, name)
-    )
-    push!(blk.args, MacroTools.combinestructdef(struct_dic))
-    push!(blk.args, :(Tensor{$(name)}(v1::V1,v2::V2,v3::V3) where {V1,V2,V3} = $(name * "Tensor"){V1,V2,V3}(v1,v2,v3)))
-
-
     #------ write ---- #
     coordinate_systems_dict[name] = struct_dic_cs
     _write_coordinate_systems(blk)
@@ -354,13 +251,22 @@ macro add_pvector()
     _write_coordinate_systems(blk)
 end
 
-macro add_scalar_product()
+macro add_ptensor()
     !(generate_coordinate_systems) && return
     cs = collect(keys(coordinate_systems_dict))
     blk = Expr(:block)
-    for (cs1, cs2) in Iterators.product(cs, cs)
-        append!(blk.args, make_scalar_product(coordinate_systems_dict[cs1], coordinate_systems_dict[cs2]).args)
+    for cs1 in cs
+        push!(blk.args, make_ptensor(coordinate_systems_dict[cs1]))
     end
+    _write_coordinate_systems(blk)
+end
+
+
+
+macro add_scalar_product()
+    !(generate_coordinate_systems) && return
+    blk = Expr(:block)
+    make_scalar_product!(blk)
     _write_coordinate_systems(blk)
 end
 
@@ -368,30 +274,58 @@ macro add_compute_projection()
     !(generate_coordinate_systems) && return
     cs = collect(keys(coordinate_systems_dict))
     blk = Expr(:block)
-    for (cs1, cs2) in Iterators.product(cs, cs)
-        append!(blk.args, make_compute_projection(coordinate_systems_dict[cs1], coordinate_systems_dict[cs2]).args)
-    end
+     make_compute_projection!(blk)
+
     _write_coordinate_systems(blk)
 end
 
-function make_change_basis_tensor(cs1,cs2)
+# function make_change_basis_tensor(cs1,cs2)
     
-    pp = [:G11, :G12, :G13, :G22, :G23, :G33]
-    pt = [:($(cs1[:name] * "BasisChangeComponent"){G11,G12,G13}),
-        :($(cs1[:name] * "BasisChangeComponent"){G12,G22,G23}),
-        :($(cs1[:name] * "BasisChangeComponent"){G13,G23,G33})]
+#     pp = [:G11, :G12, :G13, :G22, :G23, :G33]
+#     pt = [:($(cs1[:name] * "BasisChangeComponent"){G11,G12,G13}),
+#         :($(cs1[:name] * "BasisChangeComponent"){G12,G22,G23}),
+#         :($(cs1[:name] * "BasisChangeComponent"){G13,G23,G33})]
+#     fields = [(f[1],p) for (f,p) in zip(cs2[:fields],pt)]
+
+
+#     #push!(pp, cs1[:name])
+#     struct_dic = Dict(
+#         :constructors => Any[],
+#         :mutable => false,
+#         :name => cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor",
+#         :params => pp,
+#         :fields => fields,
+#         :supertype => Expr(:curly, :BasisChangeTensor, :G11, :G12, :G13, :G22, :G23, :G33, cs1[:name], cs2[:name])
+#     )
+#     blk = Expr(:block)
+#     push!(blk.args,MacroTools.combinestructdef(struct_dic) )
+#     push!(blk.args, :(BasisChangeTensor{$(cs1[:name]),$(cs2[:name])}(args...; kw...) = $(cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor")(args...; kw...)))
+#    return blk
+
+# end
+
+
+function make_change_basis_tensor(cs1, cs2)
+
+    pp = [:G1, :G2, :G3]
+    pt = [:($(cs1[:name] * "BasisChangeComponent")),
+        :($(cs1[:name] * "BasisChangeComponent")),
+        :($(cs1[:name] * "BasisChangeComponent"))]
+    fields = [(f[1], p) for (f, p) in zip(cs2[:fields], pp)]
+    pp_ = [:($p <: $t) for (p, t) in zip(pp, pt)]
+
     #push!(pp, cs1[:name])
     struct_dic = Dict(
         :constructors => Any[],
         :mutable => false,
         :name => cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor",
-        :params => pp,
-        :fields => [(f[1],p) for (f,p) in zip(cs2[:fields],pt)],
-        :supertype => Expr(:curly, :BasisChangeTensor, :G11, :G12, :G13, :G22, :G23, :G33, cs1[:name], cs2[:name])
+        :params => pp_,
+        :fields => fields,
+        :supertype => Expr(:curly, :BasisChangeTensor, :G1, :G2, :G3, cs1[:name], cs2[:name])
     )
     blk = Expr(:block)
-    push!(blk.args,MacroTools.combinestructdef(struct_dic) )
-    push!(blk.args, :(BasisChangeTensor{$(cs1[:name]),$(cs2[:name])}(args...; kw...) = $(cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor")(args...; kw...)))
+    push!(blk.args, MacroTools.combinestructdef(struct_dic))
+    push!(blk.args, :(BasisChangeTensor{$(cs1[:name]),$(cs2[:name])}(g1,g2,g3) = $(cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor")(g1,g2,g3)))
     return blk
 
 end
@@ -412,8 +346,9 @@ function make_pvector(cs1, cs2)
         )
 
         push!(blk.args, MacroTools.combinestructdef(struct_dic))
-        push!(blk.args, :(PVector{$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "P" * cs2[:name] * "PVectorTensor"){V1,V2,V3,N}(v1, v2, v3)))
-    
+        push!(blk.args, :(PVector{$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "PVector"){V1,V2,V3,N}(v1, v2, v3)))
+        push!(blk.args, :(PVector{$(cs1[:name]),$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "PVector"){V1,V2,V3,N}(v1, v2, v3)))
+
     else
         f1 = cs1[:fields]
         f1_ = [f[1] for f in f1]
@@ -436,129 +371,206 @@ end
 
 end
 
-function make_scalar_product(cs1, cs2)
+
+function make_ptensor(cs1)
     blk = Expr(:block)
-    f1 = [f[1] for f in cs1[:fields]]
-    f2 = [f[1] for f in cs2[:fields]]
-    
-    f_iter = Iterators.product(f1,f2)
-    i_iter = Iterators.product(eachindex(f1),eachindex(f2))
-    
-    G = Array{Any}(undef,3,3)
-    dims = [(2,3),(1,2)]
-    index_field = Dict()
-    index_grid  = Dict()
-    index_args = Dict()
-    index_field[1] = [:i,:s]
-    index_field[3] = [:i,:j,:s]
-    index_field[2] = [:i, :s]
-    index_grid[2] = [:i, :j]
-    index_grid[1] = [:i]
-    index_args[1] =[ :(i::Int64)]
-    index_args[2] =[:(i::Int64), :(s::Int64)]
-    index_args[3] = [:(i::Int64), :(j::Int64), :(s::Int64)]
-    S2 = cs2[:name]
-    S1 = cs1[:name]
-    for (d_grid, d_field) in dims
-        GG = [:(UArray{$d_grid}),:Missing] 
-        for (G11,G12,G13,G22,G23,G33) in Iterators.product(GG,GG,GG,GG,GG,GG)
-            G[1,1] = G11
-            G[2,1] = G12
-            G[1,2] = G12
-            G[2,2] = G22
-            G[2,3] = G23
-            G[3,3] = G33
-            G[3,2] = G23
-            G[3,1] = G13
-            G[1,3] = G13
+    C = :(Union{Missing, $(cs1[:name] * "PTensorComponent")})
 
-        if S1 == S2
-         args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...))) for (f,i) in zip(f_iter,i_iter) if (G[i...] != :Missing && f[1] == f[2])]
-                if length(args) > 0
-                    push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {U,T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+    struct_dic = Dict(
+        :constructors => Any[],
+        :mutable => false,
+        :name => cs1[:name] * "PTensorComponent",
+        :params => [:(V1), :(V2), :(V3), :N],
+        :fields => [(f[1], p) for (f, p) in zip(cs1[:fields], [:V1, :V2, :V3])],
+        :supertype => Expr(:curly, :PTensorComponent, :V1, :V2, :V3, :N, cs1[:name])
+    )
+    push!(blk.args, :(PTensorComponent{$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "PTensorComponent"){V1,V2,V3,N}(v1, v2, v3)))
 
-                end
-        else   
-        args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...)) * $(Expr(:ref,:(g.$(f[1]).$(f[2])),index_grid[d_grid]...))) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
+    push!(blk.args, MacroTools.combinestructdef(struct_dic))
+
+            struct_dic = Dict(
+            :constructors => Any[],
+            :mutable => false,
+            :name => cs1[:name] * "PTensor",
+            :params => [:(V1<:$C), :(V2<:$C), :(V3<:$C),:N],
+            :fields => [(f[1], p) for (f, p) in zip(cs1[:fields], [:V1, :V2, :V3])],
+            :supertype => Expr(:curly, :PTensor, :V1, :V2, :V3, :N, cs1[:name])
+        )
+
+        push!(blk.args, MacroTools.combinestructdef(struct_dic))
+        push!(blk.args, :(PTensor{$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "PTensor"){V1,V2,V3,N}(v1, v2, v3)))
+
+        return blk
+
+end
+
+# function make_scalar_product(blk)
+#     f1 = [f[1] for f in cs1[:fields]]
+#     f2 = [f[1] for f in cs2[:fields]]
+    
+#     f_iter = Iterators.product(f1,f2)
+#     i_iter = Iterators.product(eachindex(f1),eachindex(f2))
+    
+#     G = Array{Any}(undef,3,3)
+#     dims = [(2,3),(1,2)]
+#     index_field = Dict()
+#     index_grid  = Dict()
+#     index_args = Dict()
+#     index_field[1] = [:i,:s]
+#     index_field[3] = [:i,:j,:s]
+#     index_field[2] = [:i, :s]
+#     index_grid[2] = [:i, :j]
+#     index_grid[1] = [:i]
+#     index_args[1] =[ :(i::Int64)]
+#     index_args[2] =[:(i::Int64), :(s::Int64)]
+#     index_args[3] = [:(i::Int64), :(j::Int64), :(s::Int64)]
+#     S2 = cs2[:name]
+#     S1 = cs1[:name]
+#     for (d_grid, d_field) in dims
+#         GG = [:(UArray{$d_grid}),:Missing] 
+#         for (G11,G12,G13,G22,G23,G33) in Iterators.product(GG,GG,GG,GG,GG,GG)
+#             G[1,1] = G11
+#             G[2,1] = G12
+#             G[1,2] = G12
+#             G[2,2] = G22
+#             G[2,3] = G23
+#             G[3,3] = G33
+#             G[3,2] = G23
+#             G[3,1] = G13
+#             G[1,3] = G13
+
+#         if S1 == S2
+#          args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...))) for (f,i) in zip(f_iter,i_iter) if (G[i...] != :Missing && f[1] == f[2])]
+#                 if length(args) > 0
+#                     push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {U,T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+
+#                 end
+#         else   
+#         args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...)) * $(Expr(:ref,:(g.$(f[1]).$(f[2])),index_grid[d_grid]...))) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
           
-          if length(args) > 0
-            push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{T,T,T,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1},$(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-            push!(blk.args, :(⋅(v2::ComponentVector{T,T,T,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-        end
-    end
-        end
-    end
-    GG = [:Float64,:Missing] 
-        for (G11,G12,G13,G22,G23,G33) in Iterators.product(GG,GG,GG,GG,GG,GG)
-            G[1,1] = G11
-            G[2,1] = G12
-            G[1,2] = G12
-            G[2,2] = G22
-            G[2,3] = G23
-            G[3,3] = G33
-            G[3,2] = G23
-            G[3,1] = G13
-            G[1,3] = G13
-    args =[:(v1.$(f[1]) * v2.$(f[2]) * g.$(f[1]).$(f[2])) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
-    if length(args) > 0
-        push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-        if S1 != S2
-            push!(blk.args, :(⋅(v2::ComponentVector{U,U,U,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-        end
-    end
-end
+#           if length(args) > 0
+#             push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{T,T,T,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1},$(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#             push!(blk.args, :(⋅(v2::ComponentVector{T,T,T,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#         end
+#     end
+#         end
+#     end
+#     GG = [:Float64,:Missing] 
+#         for (G11,G12,G13,G22,G23,G33) in Iterators.product(GG,GG,GG,GG,GG,GG)
+#             G[1,1] = G11
+#             G[2,1] = G12
+#             G[1,2] = G12
+#             G[2,2] = G22
+#             G[2,3] = G23
+#             G[3,3] = G33
+#             G[3,2] = G23
+#             G[3,1] = G13
+#             G[1,3] = G13
+#     args =[:(v1.$(f[1]) * v2.$(f[2]) * g.$(f[1]).$(f[2])) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
+#     if length(args) > 0
+#         push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#         if S1 != S2
+#             push!(blk.args, :(⋅(v2::ComponentVector{U,U,U,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#         end
+#     end
+# end
 
-    if S1 == S2
-        args =[:(v1.$(f) * (v2.$(f))) for (f) in f1]
-        push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}) where {U,T} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-    end
+#     if S1 == S2
+#         args =[:(v1.$(f) * (v2.$(f))) for (f) in f1]
+#         push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}) where {U,T} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#     end
 
-    return blk
-end
+# end
 
 
-function make_compute_projection(cs1, cs2)
-    S2 = cs2[:name]
-    S1 = cs1[:name]
-    blk = Expr(:block)
-    S1 == S2 && return blk
-    f1 = [f[1] for f in cs1[:fields]]
+
+
+function make_compute_projection!(blk)
+
+    f1 = copy(cfields)
     f_iter = f1
     i_iter = eachindex(f1)
 
     G = Array{Any}(undef, 3)
-    dims = [(2, 3), (1, 2)]
-    index_field = Dict()
-    index_grid = Dict()
-    index_args = Dict()
-    index_field[1] = [:i, :s]
-    index_field[3] = [:i, :j, :s]
-    index_field[2] = [:i, :s]
-    index_grid[2] = [:i, :j]
-    index_grid[1] = [:i]
-    index_args[1] = [:(i::Int64)]
-    index_args[2] = [:(i::Int64), :(s::Int64)]
-    index_args[3] = [:(i::Int64), :(j::Int64), :(s::Int64)]
-    components_S2 = [f[2] for f in cs2[:fields]]
-    for component in components_S2
-        if (component, S1) ∉ compute_projection_list
-        for (d_grid, d_field) in dims
-            GG = [:(UArray{$d_grid}), :Missing]
+            GG = [:(UArray{N}), :Missing]
             for (G1, G2, G3) in Iterators.product(GG, GG, GG)
                 G[1] = G1
                 G[2] = G2
                 G[3] = G3
 
-                args = [:($(Expr(:ref, :(v.$(f)), index_field[d_field]...)) * $(Expr(:ref, :(g.$(f)), index_grid[d_grid]...))) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
+                args = [:(v.$(f)[index...]* g.$(f)[index...]) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
             
                 if length(args) > 0
-                    push!(blk.args, :(compute_projection(c::$component, v::PhysicsComponentVector{T,T,T,$S1}, g::BasisChangeComponent{$G1,$G2,$G3,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+                    push!(blk.args, :(compute_projection( v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}, index::Vararg{Int64,N}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+                end
+                args = [:(v.$(f)* g.$(f)) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
+            
+                if length(args) > 0
+                    push!(blk.args, :(compute_projection( v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = @views @. $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
                 end
             end
-        end
-        push!(compute_projection_list, (component, S1))
-    end
-    end
-    return blk
+            GG = [Float64, :Missing]
+            for (G1, G2, G3) in Iterators.product(GG, GG, GG)
+                G[1] = G1
+                G[2] = G2
+                G[3] = G3
 
-end
+                args = [:(v.$(f)[index...]* g.$(f)[index...]) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
+            
+                if length(args) > 0
+                    push!(blk.args, :(compute_projection( v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:Float64,S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+                end
+
+            end
+        end
+
+
+
+
+
+
+# function make_compute_projection(cs1, cs2)
+#     S2 = cs2[:name]
+#     S1 = cs1[:name]
+#     blk = Expr(:block)
+#     S1 == S2 && return blk
+#     f1 = [f[1] for f in cs1[:fields]]
+#     f_iter = f1
+#     i_iter = eachindex(f1)
+
+#     G = Array{Any}(undef, 3)
+#     dims = [(2, 3), (1, 2)]
+#     index_field = Dict()
+#     index_grid = Dict()
+#     index_args = Dict()
+#     index_field[1] = [:i, :s]
+#     index_field[3] = [:i, :j, :s]
+#     index_field[2] = [:i, :s]
+#     index_grid[2] = [:i, :j]
+#     index_grid[1] = [:i]
+#     index_args[1] = [:(i::Int64)]
+#     index_args[2] = [:(i::Int64), :(s::Int64)]
+#     index_args[3] = [:(i::Int64), :(j::Int64), :(s::Int64)]
+#     components_S2 = [f[2] for f in cs2[:fields]]
+#     for component in components_S2
+#         if (component, S1) ∉ compute_projection_list
+#             for (d_grid, d_field) in dims
+#                 GG = [:(UArray{$d_grid}), :Missing]
+#                 for (G1, G2, G3) in Iterators.product(GG, GG, GG)
+#                     G[1] = G1
+#                     G[2] = G2
+#                     G[3] = G3
+
+#                     args = [:($(Expr(:ref, :(v.$(f)), index_field[d_field]...)) * $(Expr(:ref, :(g.$(f)), index_grid[d_grid]...))) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
+
+#                     if length(args) > 0
+#                         push!(blk.args, :(compute_projection(c::$component, v::PhysicsComponentVector{T,T,T,$S1}, g::BasisChangeComponent{$G1,$G2,$G3,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#                     end
+#                 end
+#             end
+#             push!(compute_projection_list, (component, S1))
+#         end
+#     end
+#     return blk
+
+# end

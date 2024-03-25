@@ -16,12 +16,11 @@ gₖₖ =  1
 "
 
 using CoordinatesSystems
-import CoordinatesSystems: RightContraction, ⊗, PVector, →, UnitBasisVectors, NormalizationMetric, ⋅, AbstractBasisVectors, ArrayGenerator, PhysicsComponentVector, BasisVectors, CartesianCS, CylindricalCS, MetricTensor
+import CoordinatesSystems: CSMetrics, RightContraction, ⊗, PVector, →, UnitBasisVectors, NormalizationMetric, ⋅, AbstractBasisVectors, ArrayGenerator, PhysicsComponentVector, BasisVectors, CartesianCS, CylindricalCS, MetricTensor
 
 arr_gen = ArrayGenerator(0)
 
 𝐞̂ = UnitBasisVectors(CartesianCS, arr_gen)
-
 
 
 
@@ -38,6 +37,7 @@ g̅̅ = MetricTensor(𝐮)
 h = NormalizationMetric(g̅̅)
 Λ̅̅ = 𝐮̂ → 𝐞̂
 𝐱 = 𝐞̂(2.0, 1.0, 0.0)
+CSMetrics(𝐞̂)
 
 a = 2.0
 b=3.0

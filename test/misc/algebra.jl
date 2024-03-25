@@ -5,43 +5,30 @@ struct Pressure  end
 struct Temperature  end
 struct Velocity end 
 
-struct DiffusionCoeffient{T}
-≝()
-DiffusionCoefficientTensor = DiffusionCoeffient{Tensor}
-DiffusionCoefficientScalar = DiffusionCoeffient{Scalar}
-DiffusionCoefficientVector = DiffusionCoeffient{Vector}
-struct ComputeDefinition
-    out
-    operator
-    species
-    component
-end
-struct Gradient
-    field
-end
+
 
 ∇(T) = Gradient(T)
-@main_variable n ≝ Density
+@main_variable n = Density
 @species_parameter m = Mass
 @main_variable nm𝐯 = Momemtum
 @main_variable p = Pressure
 @aux_variable T= Temperature
 @aux_variable 𝐯 = Velocity
-@species(ions) 𝐯 ≝ nmv/m/n
+@compute species = ions 𝐯 ≝ nmv/m/n
 @compute  T ≝ p/n/ee
-@compute n(:electron) ≝ ∑(Z*n,:ions)
+@compute n(electron) ≝ ∑(Z*n,ions)
 @compute nodes = faces ∇(n), ∇(T), ∇(v)
 @parameter α_conv= VectorParameter
 @parameter D = DiffusionCoefficientTensor
 @parameter ν = ViscocityTensor
 @parameter κ = ThermalDiffusivityTensor
 
-@aux_variable species = impurity component = s∥ Fthe = α_e * ∇(T)
-@aux_variable species = impurity component = s Fthi = α_i * ∇(T)
-@flux Γdiff = ParticeDiffusionFlux
+@compute species = impurity component = s∥ Fthe = α_e * ∇(T)
+@comopute species = impurity component = s Fthi = α_i * ∇(T)
+@flux Γdiff = ParticleDiffusionFlux
 𝒮 = Sources()
 ℛ = Reactions()
-Γₙ ≝ n × 𝐯
+@compute Γₙ ≝ n × 𝐯
 @compute Γdiff ≝ -D ⋅ ∇(n)
 @compute Qdiff ≝ -κ ⋅ ∇(T)
 @compute Γndiff ≝ -D ⋅ ∇(n)
@@ -52,10 +39,10 @@ Qconf ≝ α_conv ⊗ nm𝐯 * T
 Γₚ ≝ p × 𝐯
 𝒮 ≝ Sv + Fthi(impurities,∥) + Fthe(impurities,∥)
 
-@equation species = ions ∂ₜ(n) + ∇ ⋅ (Γₙ+Γdiff) = ℛ + 𝒮
-@equation species = ions ∂ₜ(mn𝐯) + ∇ ⋅ (Γᵥ + Π) = ℛ + 𝒮
-@equation species = ions ∂ₜ(3/2 × p) + ∇ ⋅ (Qconv + Qdiff + Π⋅𝐯) = ℛ + 𝒮
-∑(Γ::T, σ::S,args...) = ⋅(Γ.n, σ.n, args...) + ⋅(Γ.n, σ.n, args...) + ⋅(Γ.n, σ.n, args...) + ⋅(Γ.n, σ.n, args...) 
+@equation particle  ∂ₜ(n) + ∇ ⋅ (Γₙ+Γdiff) = ℛ + S
+@equation momemtum  ∂ₜ(mn𝐯) + ∇ ⋅ (Γᵥ + Π) = ℛ + Fthi(impurities,∥) + Fthe(impurities,∥)
+@equation heat species = ions ∂ₜ(3/2 × p) + ∇ ⋅ (Qconv + Qdiff + Π⋅𝐯) = ℛ + 𝒮
+
 
 Expr(:ccall,+,Expr())
 for i in fieldnames(T) * fieldnames(T) 
