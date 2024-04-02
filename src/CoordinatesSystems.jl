@@ -1,30 +1,34 @@
 module CoordinatesSystems
 include("array_generators.jl")
-generate_coordinate_systems = true
+generate_coordinate_systems = false
 export Component, Coordinate, CoordinateSystem
 
 
 UArray{D} = Array{Float64,D}
+abstract type AbstractCSComponentObject end
 abstract type CoordinateSystem end
-abstract type AbstractPhysicsComponentVector{S} end
+abstract type AbstractCSTensor{S} <: AbstractCSComponentObject end
+abstract type AbstractCSVector{S} <: AbstractCSComponentObject end
+
+abstract type AbstractPhysicsComponentVector{S} <: AbstractCSVector{S} end
 abstract type AbstractPhysicsComponentVectors{S} end
 abstract type AbstractBasisVectors{S} end
-abstract type AbstractBasisVector{S} end
+abstract type AbstractBasisVector{S} <: AbstractCSVector{S} end
 abstract type AbstractUnitBasisVectors{S} <: AbstractBasisVectors{S} end
-abstract type AbstractUnitBasisVector{S} end
+abstract type AbstractUnitBasisVector{S} <: AbstractCSVector{S} end
 
 abstract type AbstractComponentOperatorCS{S} end
-abstract type AbstractPhysicsCoordinates{S} end
-abstract type AbstractTensorComponent{S<:CoordinateSystem} end
+abstract type AbstractPhysicsCoordinates{S} <: AbstractCSVector{S} end
+abstract type AbstractTensorComponent{S<:CoordinateSystem}  end
 abstract type AbstractMetricTensorComponent{S<:CoordinateSystem} end
 abstract type AbstractBasisChangeComponent{S<:CoordinateSystem} end
-abstract type AbstractComponentOperator{S,O} end
+abstract type AbstractComponentOperator{S,O} <: AbstractCSComponentObject end
 abstract type ComponentOperator{V1,V2,V3,S,O} <: AbstractComponentOperator{S,O} end
 abstract type AbstractBasisComponent{S<:CoordinateSystem} end
 abstract type AbstractPhysicsCoordinate{S} end
-abstract type AbstractPVector{S1,S2,N} end
-abstract type AbstractPTensor{S,N} end
-abstract type AbstractPTensorComponent{S,N} end
+abstract type AbstractPVector{S1,S2,N} <: AbstractCSComponentObject end
+abstract type AbstractPTensor{S,N} <: AbstractCSTensor{S} end
+abstract type AbstractPTensorComponent{S,N} <: AbstractCSVector{S} end
 abstract type PVector{V1,V2,V3,P1,P2,P3,N,S1,S2} <: AbstractPVector{S1,S2,N} end
 abstract type PTensor{V1,V2,V3,N,S} <: AbstractPTensor{S,N} end
 abstract type PTensorComponent{V1,V2,V3,N,S} <: AbstractPTensorComponent{S,N} end
@@ -34,10 +38,10 @@ abstract type AbstractDyadicTensorComponent{S} end
 
 abstract type AbstractBasisChangeTensor{S1,S2} end
 
-abstract type AbstractTensor{S<:CoordinateSystem} end
-abstract type AbstractDiagonalTensor{S<:CoordinateSystem} end
+abstract type AbstractTensor{S<:CoordinateSystem} <: AbstractCSTensor{S} end
+abstract type AbstractDiagonalTensor{S<:CoordinateSystem} <: AbstractCSTensor{S} end
 abstract type AbstractMetricTensor{S<:CoordinateSystem} <: AbstractTensor{S} end
-abstract type AbstractCSMetrics{S} end
+abstract type AbstractCSMetrics{S} <: AbstractCSTensor{S} end
 
 abstract type BasisChangeTensor{G1,G2,G3,S1<:CoordinateSystem,S2<:CoordinateSystem} <: AbstractBasisChangeTensor{S1,S2} end
 abstract type AbstractRightContraction{S} <: AbstractComponentOperatorCS{S} end
@@ -47,6 +51,7 @@ abstract type AbstractNormalizationMetric{S} end
 
 abstract type Component{T} end
 abstract type Coordinate{T} end
+AbstractComponentVector{S} = Union{AbstractDyadicTensorComponent{S},AbstractBasisChangeComponent{S},AbstractUnitBasisVector{S},AbstractPhysicsComponentVector{S},AbstractPVector{S,S2,N}} where {S2,N}
 
 get_cs_type(::AbstractCSMetrics{S}) where S = S
 ε = 1e-14
@@ -68,6 +73,7 @@ include("code_generator.jl")
 @add_coordinate_type Y
 @add_coordinate_type Z
 
+
 @add_coordinate_system CartesianCS x = X y = Y z = Z
 @add_coordinate_system ParallelFieldAlignedCS ǁ = Parallel ⊥ = Crossfield ʌ = Diamagnetic
 @add_coordinate_system PoloidalFieldAlignedCS x = Poloidal y = Crossfield ϕ = Toroidal
@@ -75,7 +81,6 @@ include("code_generator.jl")
 @add_coordinate_system SphericalCS r = Radial θ = Poloidal Ψ = Azimuthal
 @add_coordinate_system ToroidalCS r = Radial θ = Poloidal ϕ = Toroidal
 @add_coordinate_system PseudoToroidalCS R = Radial Z = Vertical ϕ = Toroidal
-
 
 
 @add_basis_change_tensor
@@ -86,11 +91,12 @@ include("code_generator.jl")
 include(get_coordinate_systems_filename())
 
 
-AbstractComponentVector{S} = Union{AbstractDyadicTensorComponent{S},AbstractBasisChangeComponent{S},AbstractUnitBasisVector{S},AbstractPhysicsComponentVector{S}}
-ComponentVector{E1,E2,E3,S} = Union{DyadicTensorComponent{E1,E2,E3,S},BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PhysicsComponentVector{E1,E2,E3,S}}
-ComponentVectors{E1,E2,E3,S} = Union{UnitBasisVector{E1,E2,E3,S},PhysicsComponentVectors{E1,E2,E3,S}}
-AbstractCSVector{S} = Union{AbstractBasisVector{S},AbstractUnitBasisVector{S},AbstractPhysicsComponentVector{S}}
+#AbstractCSVector{S} = Union{AbstractBasisVector{S},AbstractUnitBasisVector{S},AbstractPhysicsComponentVector{S}}
 AbstractCSVectors{S} = Union{AbstractBasisVectors{S},AbstractUnitBasisVectors{S},AbstractPhysicsComponentVectors{S}}
+
+
+ComponentVector{E1,E2,E3,S} = Union{DyadicTensorComponent{E1,E2,E3,S},BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PhysicsComponentVector{E1,E2,E3,S},PVector{E1,E2,E3,E1,E2,E3,<:Any,S,S}}
+ComponentVectors{E1,E2,E3,S} = Union{UnitBasisVector{E1,E2,E3,S},PhysicsComponentVectors{E1,E2,E3,S}}
 
 
 include("pvectors.jl")
@@ -102,7 +108,7 @@ PhysicsCoordinates1D{S}(arr_gen::ArrayGenerator) where {S<:CoordinateSystem} = P
 PhysicsCoordinates2D{S}(arr_gen::ArrayGenerator) where {S<:CoordinateSystem} = PhysicsCoordinates{S}(arr_gen(), arr_gen(), missing)
 PhysicsCoordinates3D{S}(arr_gen::ArrayGenerator) where {S<:CoordinateSystem} = PhysicsCoordinates{S}(arr_gen(), arr_gen(), arr_gen())
 
-NormalizationMetric(g::AbstractMetricTensor{S}) where {S} = NormalizationMetric{S}((1.0 / sqrt.(getproperty(getproperty(g, fn), fn)) for fn in propertynames(g))...)
+NormalizationMetric(g::AbstractMetricTensor{S}) where {S} = NormalizationMetric{S}((1.0 ./ sqrt.(getproperty(getproperty(g, fn), fn)) for fn in propertynames(g))...)
 Tensor{S}(arr_gen::ArrayGenerator) where {S<:CoordinateSystem} = Tensor{S}(TensorComponent{S}(arr_gen), TensorComponent{S}(arr_gen), TensorComponent{S}(arr_gen))
 TensorComponent{S}(arr_gen::ArrayGenerator) where {S} = TensorComponent{S}(arr_gen(), arr_gen(), arr_gen())
 
@@ -149,7 +155,7 @@ Base.:/(f::U, v::T) where {S,U<:Array,T <:AbstractComponentVector{S}} = PhysicsC
 
 # operation: a * 𝐯 = 𝐯_new(a*v1,a*v2, a*v3)
 
-
+PVector{N}(v::AbstractPVector{S1,S2,Generic}) where {N,S1,S2} = PVector{S1,S2,N}((getproperty(v,fn) for fn in propertynames(v))...)
 
 Base.:/(f::Float64, v::T) where {S,T<:AbstractCSVector{S}} = PhysicsComponentVector{S}((getproperty(v, fn) / f for fn in fieldnames(T))...)
 Base.:+(v1::T, v2::T) where {S,T<:AbstractCSVector{S}} = PhysicsComponentVector{S}((getproperty(v1, fn) + getproperty(v2, fn) for fn in fieldnames(T))...)
@@ -307,13 +313,14 @@ compute!(e::AbstractBasisVectors, a, b , c)  = sum(d * getproperty(e, fn) for (d
 ⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 ⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}) where {T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
-⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}) where {N,T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
+#⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+#⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}) where {N,T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
 
 ⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+#⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 
+⋅(v1::ComponentVector{U,Missing,Missing,S}, v2::ComponentVector{V,Missing,Missing,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] 
 
 ⋅(g::AbstractDyadicTensor{S}, v::AbstractCSVector{S}, args...) where {S} = RightContraction{S}((Dot(getproperty(g, fn), v) for fn in propertynames(g))...)
 ⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,V, T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
@@ -344,10 +351,27 @@ function Base.iterate(vars::PVector, state=1)
     state > length(vars) && return nothing
     return (getfield(vars, state), state + 1)
 end
-Base.length(cs::T) where {T<:PVector} = fieldcount(T)
+
+function Base.iterate(vars::PTensor, state=1)
+    state > length(vars) && return nothing
+    return (getfield(vars, state), state + 1)
+end
+
+function Base.iterate(vars::PTensorComponent, state=1)
+    state > length(vars) && return nothing
+    return (getfield(vars, state), state + 1)
+end
+
+Base.length(cs::T) where {T<:Union{PVector,PTensor, PTensorComponent}} = fieldcount(T)
 
 Base.length(cs::T) where {T<:CoordinateSystem} = fieldcount(T)
 
+
+get_component_names(v::AbstractPVector) = propertynames(v)
+get_components(::AbstractPhysicsCoordinates{S}) where {S} = [s() for s in fieldtypes(S)]
+get_components(::AbstractPVector{S,S,N}) where {S,N} = [s() for s in fieldtypes(S)]
+get_components(::AbstractPTensor{S,N}) where {S,N} = [s() for s in fieldtypes(S)]
+export get_components
 # Metrics{S1,S2}
 #@node_def PointNode 1D = [x] 2D = [y]
 #@node_def VectorNode 1D = [x] 2D = [y]

@@ -6,10 +6,11 @@ Base.:*(s::Symbol, ss::String) = Symbol(string(s) * ss)
 Base.:*(ss::String, s::Symbol) = Symbol(ss*string(s))
 Base.:*(s::Symbol, ss::Symbol) = Symbol(string(s) * string(ss))
 function write_expr(fn, expr; mode="a")
-    open(fn, mode) do io
+    i = open(fn, mode) do io
         write(io, join(string.(s for s in expr.args), "\n"))
         write(io, "\n")
     end
+    @assert i==1 
 end
 
 
@@ -58,6 +59,9 @@ macro add_coordinate_type(name)
         end
         
         get_component_name(::$name_component) = $(QuoteNode(name_component_field))
+        get_component(v::AbstractCSComponentObject, c::$name_component) = getproperty(v, $(QuoteNode(name_component_field)))
+        Component{$(QuoteNode(name_component_field))}() = $name_component{Generic}()
+        Coordinate{$(QuoteNode(name_coordinate_field))}() = $name_coordinate{Generic}()
         get_coordinate_name(::$name_coordinate) = $(QuoteNode(name_coordinate_field))
         get_component_name(::Type{<:$name_component}) = $(QuoteNode(name_component_field))
         get_coordinate_name(::Type{<:$name_coordinate}) = $(QuoteNode(name_coordinate_field))
@@ -182,9 +186,17 @@ macro add_coordinate_system(args...)
         :fields => fields,
         :supertype => :CoordinateSystem
     )
+
     push!(blk.args, MacroTools.combinestructdef(struct_dic_cs))
     push!(blk.args, :(export $name))
     push!(blk.args, :($name() = $name((T() for T in fieldtypes($name))...)))
+    for (i, ft) in enumerate([ v * "Component" for (k, v) in kwargs])
+        push!(blk.args, :((c::$ft)(v::AbstractComponentVector{$name}) where {E1,E2,E3} = getfield(v, $i)))
+    end
+    for (i, fc) in enumerate([ v * "Coordinate" for (k, v) in kwargs])
+        push!(blk.args, :((c::$fc)(v::AbstractComponentVector{$name}) where {E1,E2,E3} = getfield(v, $i)))
+    end
+
     # vector
     
     add_vectortype(blk, name, kwargs, "PhysicsComponentVector")
@@ -221,7 +233,6 @@ macro add_coordinate_system(args...)
     push!(blk.args, MacroTools.combinestructdef(struct_dic))
     push!(blk.args, :(ComponentOperator{$name,O}(v1::V1, v2::V2, v3::V3) where {O,V1,V2,V3} = $(name * "ComponentOperator"){O}(v1, v2, v3)))
     push!(blk.args, :($(name * "ComponentOperator"){O}(v1::V1, v2::V2, v3::V3) where {O,V1,V2,V3} = $(name * "ComponentOperator"){V1,V2,V3,O}(v1, v2, v3)))
-
     # normalization metric 
 
     

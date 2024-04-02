@@ -1,19 +1,37 @@
 
 # --- Array Generator ----
-abstract type AbstractArrayGenerator{B,T,D,DIM} end
+struct GridDimension{D} end
+_2D = GridDimension{2}
+_1D = GridDimension{1}
+_3D = GridDimension{3}
+export GridDimension, _1D, _2D, _3D
+Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{2}}) = print(io, "2D")
+Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{1}}) = print(io, "1D")
+Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{3}}) = print(io, "3D")
+Base.show(io::IO, ::Type{GridDimension{2}}) = print(io, "2D")
+Base.show(io::IO, ::Type{GridDimension{1}}) = print(io, "1D")
+Base.show(io::IO, ::Type{GridDimension{3}}) = print(io, "3D")
+
+GridDimension(dim::Int64) = GridDimension{dim}
+GridDimension(dim::Type{<:GridDimension}) = dim
+Base.isless(::Type{GridDimension{D}}, i::Int64) where D = Base.isless(D,i) 
+
+abstract type AbstractArrayGenerator{B,T,D,DIM<:GridDimension} end
 abstract type Backend end 
 struct CPUBackend <: Backend end 
+
+
 CPUBackend(x) = x 
-struct ArrayGenerator{B<:Backend,T,D,DIM} <: AbstractArrayGenerator{B,T,D,DIM}
+struct ArrayGenerator{B<:Backend,T,D,DIM<:GridDimension} <: AbstractArrayGenerator{B,T,D,DIM}
     dims::D
     backend::B
 end
 
-struct PrefilledArrayGenerator{B<:Backend,T,D,DIM} <: AbstractArrayGenerator{B,T,D,DIM}
+struct PrefilledArrayGenerator{B<:Backend,T,D,DIM<:GridDimension} <: AbstractArrayGenerator{B,T,D,DIM}
     value::T
 end
 
-ArrayGenerator{B,T,D}(dims::Tuple; dim=length(dims)) where {B,T,D<:Tuple} = ArrayGenerator{B,T,D,dim}(dims::Tuple, B())
+ArrayGenerator{B,T,D}(dims::Tuple; dim=length(dims)) where {B,T,D<:Tuple} = ArrayGenerator{B,T,D,GridDimension(dim)}(dims::Tuple, B())
 ArrayGenerator{B,T}(dims::D; kw...) where {N,B,T,D<:NTuple{N,Int64}} = ArrayGenerator{B,T,D}(dims; kw...)
 ArrayGenerator{B,T}(args::Vararg{Int64,N}; kw...) where {N,B,T} = ArrayGenerator{B,T,D}(tuple(args...); kw...)
 
@@ -21,7 +39,7 @@ ArrayGenerator{B}(args::Vararg{Int64,N}; T=Float64,kw...) where {N,B} = ArrayGen
 ArrayGenerator{B}(args::NTuple{N,Int64}; T=Float64, kw...) where {N,B} = ArrayGenerator{B,T}(args; kw...)
 ArrayGenerator(args::Vararg{Int64,N}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(tuple(args...); kw...)
 ArrayGenerator(args::NTuple{N,Int64}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(args; kw...)
-PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array,N} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),length(size(v))}(v)
+PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array,N} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),GridDimension(length(size(v)))}(v)
 
 # ArrayGenerator{B,T}(nx::Int64, ny::Int64, nz::Int64; kw...) where {B,T} = ArrayGenerator{B,T}((nx, ny, nz); kw...)()
 # ArrayGenerator{B,T,D}(nx::Int64; kw...) where {B,T,D} = ArrayGenerator{B,T,D}((nx,); kw...)()
@@ -32,6 +50,9 @@ PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array,N} = Prefill
 function (arr_gen::ArrayGenerator{B,T,D,DIM})(; fill=0.0, extra_dim=0, type=missing) where {T,D,B<:Backend,DIM}
     if type isa Missing
         type = T
+    end
+    if fill isa Missing
+        fill = 0.0 
     end
    
     dims = [d for d in arr_gen.dims]

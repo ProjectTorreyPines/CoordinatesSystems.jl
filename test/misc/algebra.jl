@@ -1,47 +1,3 @@
-struct Density end
-struct Mass  end
-struct Momemtum  end
-struct Pressure  end
-struct Temperature  end
-struct Velocity end 
-
-
-
-∇(T) = Gradient(T)
-@main_variable n = Density
-@species_parameter m = Mass
-@main_variable nm𝐯 = Momemtum
-@main_variable p = Pressure
-@aux_variable T= Temperature
-@aux_variable 𝐯 = Velocity
-@compute species = ions 𝐯 ≝ nmv/m/n
-@compute  T ≝ p/n/ee
-@compute n(electron) ≝ ∑(Z*n,ions)
-@compute nodes = faces ∇(n), ∇(T), ∇(v)
-@parameter α_conv= VectorParameter
-@parameter D = DiffusionCoefficientTensor
-@parameter ν = ViscocityTensor
-@parameter κ = ThermalDiffusivityTensor
-
-@compute species = impurity component = s∥ Fthe = α_e * ∇(T)
-@comopute species = impurity component = s Fthi = α_i * ∇(T)
-@flux Γdiff = ParticleDiffusionFlux
-𝒮 = Sources()
-ℛ = Reactions()
-@compute Γₙ ≝ n × 𝐯
-@compute Γdiff ≝ -D ⋅ ∇(n)
-@compute Qdiff ≝ -κ ⋅ ∇(T)
-@compute Γndiff ≝ -D ⋅ ∇(n)
-Γndiff ≝ -D × ∇(v)
-Qconf ≝ α_conv ⊗ nm𝐯 * T  
-Γ ≝ Γₙ - Γdiff
-Γᵥ ≝ nm𝐯 ⊗ 𝐯
-Γₚ ≝ p × 𝐯
-𝒮 ≝ Sv + Fthi(impurities,∥) + Fthe(impurities,∥)
-
-@equation particle  ∂ₜ(n) + ∇ ⋅ (Γₙ+Γdiff) = ℛ + S
-@equation momemtum  ∂ₜ(mn𝐯) + ∇ ⋅ (Γᵥ + Π) = ℛ + Fthi(impurities,∥) + Fthe(impurities,∥)
-@equation heat species = ions ∂ₜ(3/2 × p) + ∇ ⋅ (Qconv + Qdiff + Π⋅𝐯) = ℛ + 𝒮
 
 
 Expr(:ccall,+,Expr())
@@ -104,8 +60,7 @@ end
 Γ = FluxVector()
 σ = NormalSurface()
 
-div(Γ::FluxVector,σ::SurfaceNormals) = Γ.n ⋅ σ.n + Γ.s ⋅ σ.s
-gradient(::Scalar) = Γ.n ⋅ σ.n + Γ.s ⋅ σ.s
+
  () = 
 macro 
 ⋅(A, B) = ⋅(A, B,_g)
