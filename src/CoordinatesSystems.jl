@@ -95,7 +95,7 @@ include(get_coordinate_systems_filename())
 AbstractCSVectors{S} = Union{AbstractBasisVectors{S},AbstractUnitBasisVectors{S},AbstractPhysicsComponentVectors{S}}
 
 
-ComponentVector{E1,E2,E3,S} = Union{DyadicTensorComponent{E1,E2,E3,S},BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PhysicsComponentVector{E1,E2,E3,S},PVector{E1,E2,E3,E1,E2,E3,<:Any,S,S}}
+ComponentVector{E1,E2,E3,S} = Union{PTensorComponent{E1,E2,E3,<:Any,S}, DyadicTensorComponent{E1,E2,E3,S},BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PhysicsComponentVector{E1,E2,E3,S},PVector{E1,E2,E3,E1,E2,E3,<:Any,S,S}}
 ComponentVectors{E1,E2,E3,S} = Union{UnitBasisVector{E1,E2,E3,S},PhysicsComponentVectors{E1,E2,E3,S}}
 
 
@@ -192,6 +192,10 @@ function Base.show(io::IO, mt::AbstractMetricTensor{S1}) where {S1}
         println(io, "$fn | ", (fmt_g(getproperty(mc, fnn)) for fnn in propertynames(mc))...)
     end
 end
+
+Base.show(io::IO, v::AbstractPVector) = print(io, "[$(getfield(v,1)),$(getfield(v,2)),$(getfield(v,3))]")
+Base.show(io::IO, ::MIME"text/plain", v::AbstractPVector) = print(io, "[$(getfield(v,1)),$(getfield(v,2)),$(getfield(v,3))]")
+
 
 using Format
 fmt_g(f::Vector{Float64}) = "Vector{Float64}"
@@ -366,11 +370,14 @@ Base.length(cs::T) where {T<:Union{PVector,PTensor, PTensorComponent}} = fieldco
 
 Base.length(cs::T) where {T<:CoordinateSystem} = fieldcount(T)
 
-
+get_component_names(v::AbstractPTensor) = Base.IteratorsMD.flatten(((((Symbol(fn * "_" * fn2) for fn2 in propertynames(getproperty(v, fn)))...,) for fn in propertynames(v))...,)) 
 get_component_names(v::AbstractPVector) = propertynames(v)
 get_components(::AbstractPhysicsCoordinates{S}) where {S} = [s() for s in fieldtypes(S)]
 get_components(::AbstractPVector{S,S,N}) where {S,N} = [s() for s in fieldtypes(S)]
 get_components(::AbstractPTensor{S,N}) where {S,N} = [s() for s in fieldtypes(S)]
+get_components(::AbstractPTensorComponent{S,N}) where {S,N} = [s() for s in fieldtypes(S)]
+get_coordinates(cs::S) where {S} = [Coordinate(s()) for s in fieldtypes(S)]
+Coordinate(c::Component) = Coordinate(get_component_name(c))
 export get_components
 # Metrics{S1,S2}
 #@node_def PointNode 1D = [x] 2D = [y]
@@ -405,4 +412,14 @@ export get_components
 
 # end
 
+function get_component(v::Union{AbstractPVector, AbstractCSVector},c::Int64) 
+    getfield(v, c)
+end
+
+Component(s::Symbol) = occursin("_", string(s)) ? Tuple(Component{s_}() for s_ in Symbol.(split(string(s), "_"))) : Component{s}()
+Component(s::Tuple{Symbol,Symbol}) = (Component(s[1]), Component(s[2]))
+Coordinate(s::Symbol) = occursin("_", string(s)) ? Tuple(Coordinate{s_}() for s_ in Symbol.(split(string(s), "_"))) : Coordinate{s}()
+Coordinate(s::Tuple{Symbol,Symbol}) = (Coordinate(s[1]), Coordinate(s[2]))
+Component(c::Coordinate{T}) where T = Component(get_coordinate_name(c))
+Coordinate(::Missing) = missing
 end

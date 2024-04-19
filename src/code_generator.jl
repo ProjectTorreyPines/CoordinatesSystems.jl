@@ -410,7 +410,9 @@ function make_ptensor(cs1)
 
         push!(blk.args, MacroTools.combinestructdef(struct_dic))
         push!(blk.args, :(PTensor{$(cs1[:name]),N}(v1::V1, v2::V2, v3::V3) where {N,V1,V2,V3} = $(cs1[:name] * "PTensor"){V1,V2,V3,N}(v1, v2, v3)))
-
+        for f in cs1[:fields]
+            push!(blk.args, :((t::$(cs1[:name] * "PTensor"))(c::$(f[2])) = t.$(f[1])))
+        end
         return blk
 
 end

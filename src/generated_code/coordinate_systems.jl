@@ -4557,6 +4557,18 @@ begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             CylindricalCSPTensor{V1, V2, V3, N}(v1, v2, v3)
         end
+    (t::CylindricalCSPTensor)(c::RadialComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.r
+        end
+    (t::CylindricalCSPTensor)(c::PoloidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.θ
+        end
+    (t::CylindricalCSPTensor)(c::ZComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.z
+        end
 end
 begin
     (PTensorComponent{ParallelFieldAlignedCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
@@ -4580,6 +4592,18 @@ begin
     (PTensor{ParallelFieldAlignedCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             ParallelFieldAlignedCSPTensor{V1, V2, V3, N}(v1, v2, v3)
+        end
+    (t::ParallelFieldAlignedCSPTensor)(c::ParallelComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.ǁ
+        end
+    (t::ParallelFieldAlignedCSPTensor)(c::CrossfieldComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.⊥
+        end
+    (t::ParallelFieldAlignedCSPTensor)(c::DiamagneticComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.ʌ
         end
 end
 begin
@@ -4605,6 +4629,18 @@ begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             SphericalCSPTensor{V1, V2, V3, N}(v1, v2, v3)
         end
+    (t::SphericalCSPTensor)(c::RadialComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.r
+        end
+    (t::SphericalCSPTensor)(c::PoloidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.θ
+        end
+    (t::SphericalCSPTensor)(c::AzimuthalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.Ψ
+        end
 end
 begin
     (PTensorComponent{PoloidalFieldAlignedCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
@@ -4628,6 +4664,18 @@ begin
     (PTensor{PoloidalFieldAlignedCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             PoloidalFieldAlignedCSPTensor{V1, V2, V3, N}(v1, v2, v3)
+        end
+    (t::PoloidalFieldAlignedCSPTensor)(c::PoloidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.x
+        end
+    (t::PoloidalFieldAlignedCSPTensor)(c::CrossfieldComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.y
+        end
+    (t::PoloidalFieldAlignedCSPTensor)(c::ToroidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.ϕ
         end
 end
 begin
@@ -4653,6 +4701,18 @@ begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             PseudoToroidalCSPTensor{V1, V2, V3, N}(v1, v2, v3)
         end
+    (t::PseudoToroidalCSPTensor)(c::RadialComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.R
+        end
+    (t::PseudoToroidalCSPTensor)(c::VerticalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.Z
+        end
+    (t::PseudoToroidalCSPTensor)(c::ToroidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.ϕ
+        end
 end
 begin
     (PTensorComponent{ToroidalCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
@@ -4677,6 +4737,18 @@ begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             ToroidalCSPTensor{V1, V2, V3, N}(v1, v2, v3)
         end
+    (t::ToroidalCSPTensor)(c::RadialComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.r
+        end
+    (t::ToroidalCSPTensor)(c::PoloidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.θ
+        end
+    (t::ToroidalCSPTensor)(c::ToroidalComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.ϕ
+        end
 end
 begin
     (PTensorComponent{CartesianCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
@@ -4700,5 +4772,17 @@ begin
     (PTensor{CartesianCS, N}(v1::V1, v2::V2, v3::V3) where {N, V1, V2, V3}) = begin
             #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:412 =#
             CartesianCSPTensor{V1, V2, V3, N}(v1, v2, v3)
+        end
+    (t::CartesianCSPTensor)(c::XComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.x
+        end
+    (t::CartesianCSPTensor)(c::YComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.y
+        end
+    (t::CartesianCSPTensor)(c::ZComponent) = begin
+            #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:414 =#
+            t.z
         end
 end

@@ -31,7 +31,7 @@ struct PrefilledArrayGenerator{B<:Backend,T,D,DIM<:GridDimension} <: AbstractArr
     value::T
 end
 
-ArrayGenerator{B,T,D}(dims::Tuple; dim=length(dims)) where {B,T,D<:Tuple} = ArrayGenerator{B,T,D,GridDimension(dim)}(dims::Tuple, B())
+ArrayGenerator{B,T,D}(dims::Tuple; dim::Type{<:GridDimension}=GridDimension(length(dims))) where {B,T,D<:Tuple} = ArrayGenerator{B,T,D,dim}(dims::Tuple, B())
 ArrayGenerator{B,T}(dims::D; kw...) where {N,B,T,D<:NTuple{N,Int64}} = ArrayGenerator{B,T,D}(dims; kw...)
 ArrayGenerator{B,T}(args::Vararg{Int64,N}; kw...) where {N,B,T} = ArrayGenerator{B,T,D}(tuple(args...); kw...)
 
