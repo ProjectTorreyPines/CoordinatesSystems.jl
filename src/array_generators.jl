@@ -1,15 +1,18 @@
 
 # --- Array Generator ----
 struct GridDimension{D} end
+_0D = GridDimension{0}
 _2D = GridDimension{2}
 _1D = GridDimension{1}
 _3D = GridDimension{3}
-export GridDimension, _1D, _2D, _3D
+export GridDimension, _1D, _2D, _3D, _0D
 Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{2}}) = print(io, "2D")
 Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{1}}) = print(io, "1D")
 Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{3}}) = print(io, "3D")
+Base.show(io::IO, ::MIME"text/plain", ::Type{GridDimension{0}}) = print(io, "0D")
 Base.show(io::IO, ::Type{GridDimension{2}}) = print(io, "2D")
 Base.show(io::IO, ::Type{GridDimension{1}}) = print(io, "1D")
+Base.show(io::IO, ::Type{GridDimension{0}}) = print(io, "0D")
 Base.show(io::IO, ::Type{GridDimension{3}}) = print(io, "3D")
 
 GridDimension(dim::Int64) = GridDimension{dim}
@@ -39,7 +42,8 @@ ArrayGenerator{B}(args::Vararg{Int64,N}; T=Float64,kw...) where {N,B} = ArrayGen
 ArrayGenerator{B}(args::NTuple{N,Int64}; T=Float64, kw...) where {N,B} = ArrayGenerator{B,T}(args; kw...)
 ArrayGenerator(args::Vararg{Int64,N}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(tuple(args...); kw...)
 ArrayGenerator(args::NTuple{N,Int64}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(args; kw...)
-PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array,N} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),GridDimension(length(size(v)))}(v)
+PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),GridDimension(length(size(v)))}(v)
+PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Real} = PrefilledArrayGenerator{typeof(backend),T,0,_0D}(v)
 
 # ArrayGenerator{B,T}(nx::Int64, ny::Int64, nz::Int64; kw...) where {B,T} = ArrayGenerator{B,T}((nx, ny, nz); kw...)()
 # ArrayGenerator{B,T,D}(nx::Int64; kw...) where {B,T,D} = ArrayGenerator{B,T,D}((nx,); kw...)()
