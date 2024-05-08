@@ -42,7 +42,7 @@ ArrayGenerator{B}(args::Vararg{Int64,N}; T=Float64,kw...) where {N,B} = ArrayGen
 ArrayGenerator{B}(args::NTuple{N,Int64}; T=Float64, kw...) where {N,B} = ArrayGenerator{B,T}(args; kw...)
 ArrayGenerator(args::Vararg{Int64,N}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(tuple(args...); kw...)
 ArrayGenerator(args::NTuple{N,Int64}; backend::Backend=CPUBackend(), kw...) where {N} = ArrayGenerator{typeof(backend)}(args; kw...)
-PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Array} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),GridDimension(length(size(v)))}(v)
+PrefilledArrayGenerator(v::T; backend=CPUBackend(), dim=GridDimension(length(size(v)))) where {T<:Array} = PrefilledArrayGenerator{typeof(backend),T,length(size(v)),dim}(v)
 PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Real} = PrefilledArrayGenerator{typeof(backend),T,0,_0D}(v)
 
 # ArrayGenerator{B,T}(nx::Int64, ny::Int64, nz::Int64; kw...) where {B,T} = ArrayGenerator{B,T}((nx, ny, nz); kw...)()
