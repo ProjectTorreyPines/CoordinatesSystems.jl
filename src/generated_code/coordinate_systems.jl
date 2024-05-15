@@ -614,7 +614,6 @@ sdoc(::CartesianCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct CartesianCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -630,7 +629,6 @@ PVector{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct CartesianCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -646,7 +644,6 @@ PhysicsCoordinates{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct CartesianCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -662,7 +659,6 @@ BasisVector{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct CartesianCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -678,7 +674,6 @@ UnitBasisVector{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct CartesianCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -694,7 +689,6 @@ BasisVectors{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct CartesianCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -710,7 +704,6 @@ UnitBasisVectors{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct CartesianCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -726,7 +719,6 @@ BasisChangeComponent{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct CartesianCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -742,7 +734,6 @@ MetricTensorComponent{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct CartesianCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -758,7 +749,6 @@ TensorComponent{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct CartesianCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -774,7 +764,6 @@ PTensorComponent{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct CartesianCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -790,7 +779,6 @@ MetricTensor{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct CartesianCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -806,7 +794,6 @@ Tensor{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct CartesianCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -822,7 +809,6 @@ PTensor{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct CartesianCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -838,7 +824,6 @@ DiagonalTensor{CartesianCS}(x, y, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct CartesianCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, CartesianCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -898,7 +883,6 @@ sdoc(::ParallelFieldAlignedCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct ParallelFieldAlignedCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -914,7 +898,6 @@ PVector{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct ParallelFieldAlignedCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -930,7 +913,6 @@ PhysicsCoordinates{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct ParallelFieldAlignedCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -946,7 +928,6 @@ BasisVector{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct ParallelFieldAlignedCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -962,7 +943,6 @@ UnitBasisVector{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct ParallelFieldAlignedCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -978,7 +958,6 @@ BasisVectors{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct ParallelFieldAlignedCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -994,7 +973,6 @@ UnitBasisVectors{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct ParallelFieldAlignedCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1010,7 +988,6 @@ BasisChangeComponent{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct ParallelFieldAlignedCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1026,7 +1003,6 @@ MetricTensorComponent{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct ParallelFieldAlignedCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1042,7 +1018,6 @@ TensorComponent{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct ParallelFieldAlignedCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1058,7 +1033,6 @@ PTensorComponent{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct ParallelFieldAlignedCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1074,7 +1048,6 @@ MetricTensor{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct ParallelFieldAlignedCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1090,7 +1063,6 @@ Tensor{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct ParallelFieldAlignedCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1106,7 +1078,6 @@ PTensor{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct ParallelFieldAlignedCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1122,7 +1093,6 @@ DiagonalTensor{ParallelFieldAlignedCS}(ǁ, ⊥, ʌ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct ParallelFieldAlignedCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, ParallelFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     ǁ::E1
@@ -1182,7 +1152,6 @@ sdoc(::PoloidalFieldAlignedCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct PoloidalFieldAlignedCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1198,7 +1167,6 @@ PVector{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct PoloidalFieldAlignedCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1214,7 +1182,6 @@ PhysicsCoordinates{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct PoloidalFieldAlignedCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1230,7 +1197,6 @@ BasisVector{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct PoloidalFieldAlignedCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1246,7 +1212,6 @@ UnitBasisVector{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct PoloidalFieldAlignedCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1262,7 +1227,6 @@ BasisVectors{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct PoloidalFieldAlignedCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1278,7 +1242,6 @@ UnitBasisVectors{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct PoloidalFieldAlignedCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1294,7 +1257,6 @@ BasisChangeComponent{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct PoloidalFieldAlignedCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1310,7 +1272,6 @@ MetricTensorComponent{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct PoloidalFieldAlignedCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1326,7 +1287,6 @@ TensorComponent{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct PoloidalFieldAlignedCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1342,7 +1302,6 @@ PTensorComponent{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct PoloidalFieldAlignedCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1358,7 +1317,6 @@ MetricTensor{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct PoloidalFieldAlignedCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1374,7 +1332,6 @@ Tensor{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct PoloidalFieldAlignedCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1390,7 +1347,6 @@ PTensor{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct PoloidalFieldAlignedCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1406,7 +1362,6 @@ DiagonalTensor{PoloidalFieldAlignedCS}(x, y, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct PoloidalFieldAlignedCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, PoloidalFieldAlignedCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     x::E1
@@ -1466,7 +1421,6 @@ sdoc(::CylindricalCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct CylindricalCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1482,7 +1436,6 @@ PVector{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct CylindricalCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1498,7 +1451,6 @@ PhysicsCoordinates{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct CylindricalCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1514,7 +1466,6 @@ BasisVector{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct CylindricalCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1530,7 +1481,6 @@ UnitBasisVector{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct CylindricalCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1546,7 +1496,6 @@ BasisVectors{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct CylindricalCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1562,7 +1511,6 @@ UnitBasisVectors{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct CylindricalCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1578,7 +1526,6 @@ BasisChangeComponent{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct CylindricalCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1594,7 +1541,6 @@ MetricTensorComponent{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct CylindricalCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1610,7 +1556,6 @@ TensorComponent{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct CylindricalCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1626,7 +1571,6 @@ PTensorComponent{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct CylindricalCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1642,7 +1586,6 @@ MetricTensor{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct CylindricalCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1658,7 +1601,6 @@ Tensor{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct CylindricalCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1674,7 +1616,6 @@ PTensor{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct CylindricalCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1690,7 +1631,6 @@ DiagonalTensor{CylindricalCS}(r, θ, z) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct CylindricalCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, CylindricalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1750,7 +1690,6 @@ sdoc(::SphericalCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct SphericalCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1766,7 +1705,6 @@ PVector{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct SphericalCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1782,7 +1720,6 @@ PhysicsCoordinates{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct SphericalCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1798,7 +1735,6 @@ BasisVector{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct SphericalCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1814,7 +1750,6 @@ UnitBasisVector{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct SphericalCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1830,7 +1765,6 @@ BasisVectors{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct SphericalCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1846,7 +1780,6 @@ UnitBasisVectors{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct SphericalCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1862,7 +1795,6 @@ BasisChangeComponent{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct SphericalCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1878,7 +1810,6 @@ MetricTensorComponent{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct SphericalCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1894,7 +1825,6 @@ TensorComponent{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct SphericalCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1910,7 +1840,6 @@ PTensorComponent{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct SphericalCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1926,7 +1855,6 @@ MetricTensor{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct SphericalCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1942,7 +1870,6 @@ Tensor{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct SphericalCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1958,7 +1885,6 @@ PTensor{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct SphericalCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -1974,7 +1900,6 @@ DiagonalTensor{SphericalCS}(r, θ, Ψ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct SphericalCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, SphericalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2034,7 +1959,6 @@ sdoc(::ToroidalCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct ToroidalCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2050,7 +1974,6 @@ PVector{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct ToroidalCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2066,7 +1989,6 @@ PhysicsCoordinates{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct ToroidalCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2082,7 +2004,6 @@ BasisVector{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct ToroidalCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2098,7 +2019,6 @@ UnitBasisVector{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct ToroidalCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2114,7 +2034,6 @@ BasisVectors{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct ToroidalCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2130,7 +2049,6 @@ UnitBasisVectors{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct ToroidalCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2146,7 +2064,6 @@ BasisChangeComponent{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct ToroidalCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2162,7 +2079,6 @@ MetricTensorComponent{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct ToroidalCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2178,7 +2094,6 @@ TensorComponent{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct ToroidalCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2194,7 +2109,6 @@ PTensorComponent{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct ToroidalCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2210,7 +2124,6 @@ MetricTensor{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct ToroidalCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2226,7 +2139,6 @@ Tensor{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct ToroidalCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2242,7 +2154,6 @@ PTensor{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct ToroidalCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2258,7 +2169,6 @@ DiagonalTensor{ToroidalCS}(r, θ, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct ToroidalCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, ToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     r::E1
@@ -2318,7 +2228,6 @@ sdoc(::PseudoToroidalCS) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:194 =#
         getfield(v, 3)
     end
-abstract type PVector{E1, E2, E3, S} <: AbstractPVector{S} end
 struct PseudoToroidalCSPVector{E1, E2, E3} <: PVector{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2334,7 +2243,6 @@ PVector{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PhysicsCoordinates{E1, E2, E3, S} <: AbstractPhysicsCoordinates{S} end
 struct PseudoToroidalCSPhysicsCoordinates{E1, E2, E3} <: PhysicsCoordinates{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2350,7 +2258,6 @@ PhysicsCoordinates{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVector{E1, E2, E3, S} <: AbstractBasisVector{S} end
 struct PseudoToroidalCSBasisVector{E1, E2, E3} <: BasisVector{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2366,7 +2273,6 @@ BasisVector{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVector{E1, E2, E3, S} <: AbstractUnitBasisVector{S} end
 struct PseudoToroidalCSUnitBasisVector{E1, E2, E3} <: UnitBasisVector{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2382,7 +2288,6 @@ UnitBasisVector{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisVectors{E1, E2, E3, S} <: AbstractBasisVectors{S} end
 struct PseudoToroidalCSBasisVectors{E1, E2, E3} <: BasisVectors{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2398,7 +2303,6 @@ BasisVectors{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type UnitBasisVectors{E1, E2, E3, S} <: AbstractUnitBasisVectors{S} end
 struct PseudoToroidalCSUnitBasisVectors{E1, E2, E3} <: UnitBasisVectors{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2414,7 +2318,6 @@ UnitBasisVectors{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type BasisChangeComponent{E1, E2, E3, S} <: AbstractBasisChangeComponent{S} end
 struct PseudoToroidalCSBasisChangeComponent{E1, E2, E3} <: BasisChangeComponent{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2430,7 +2333,6 @@ BasisChangeComponent{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensorComponent{E1, E2, E3, S} <: AbstractMetricTensorComponent{S} end
 struct PseudoToroidalCSMetricTensorComponent{E1, E2, E3} <: MetricTensorComponent{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2446,7 +2348,6 @@ MetricTensorComponent{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type TensorComponent{E1, E2, E3, S} <: AbstractTensorComponent{S} end
 struct PseudoToroidalCSTensorComponent{E1, E2, E3} <: TensorComponent{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2462,7 +2363,6 @@ TensorComponent{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensorComponent{E1, E2, E3, S} <: AbstractPTensorComponent{S} end
 struct PseudoToroidalCSPTensorComponent{E1, E2, E3} <: PTensorComponent{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2478,7 +2378,6 @@ PTensorComponent{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type MetricTensor{E1, E2, E3, S} <: AbstractMetricTensor{S} end
 struct PseudoToroidalCSMetricTensor{E1, E2, E3} <: MetricTensor{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2494,7 +2393,6 @@ MetricTensor{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type Tensor{E1, E2, E3, S} <: AbstractTensor{S} end
 struct PseudoToroidalCSTensor{E1, E2, E3} <: Tensor{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2510,7 +2408,6 @@ Tensor{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PTensor{E1, E2, E3, S} <: AbstractPTensor{S} end
 struct PseudoToroidalCSPTensor{E1, E2, E3} <: PTensor{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2526,7 +2423,6 @@ PTensor{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type DiagonalTensor{E1, E2, E3, S} <: AbstractDiagonalTensor{S} end
 struct PseudoToroidalCSDiagonalTensor{E1, E2, E3} <: DiagonalTensor{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1
@@ -2542,7 +2438,6 @@ DiagonalTensor{PseudoToroidalCS}(R, Z, ϕ) = begin
         #= /Users/jeromeguterl/development/StataMater/CoordinatesSystems.jl/src/code_generator.jl:88 =#
         compute!(e, a, b, c)
     end
-abstract type PDiagonalTensor{E1, E2, E3, S} <: AbstractPDiagonalTensor{S} end
 struct PseudoToroidalCSPDiagonalTensor{E1, E2, E3} <: PDiagonalTensor{E1, E2, E3, PseudoToroidalCS}
     #= /Users/jeromeguterl/.julia/packages/MacroTools/Cf2ok/src/structdef.jl:58 =#
     R::E1

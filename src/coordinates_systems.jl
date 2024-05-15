@@ -30,22 +30,36 @@ abstract type AbstractBasisChangeComponent{S} <: AbstractCSVector{S} end
 abstract type AbstractBasisComponent{S} end
 abstract type AbstractPhysicsCoordinate{S} end
 # abstract type AbstractPVector{S1,S2,N} <: AbstractCSComponentObject end
-# abstract type AbstractPTensor{S,N} <: AbstractCSTensor{S} end
 # abstract type AbstractPTensorComponent{S,N} <: AbstractCSVector{S} end
 # abstract type PVector{V1,V2,V3,P1,P2,P3,N,S1,S2} <: AbstractPVector{S1,S2,N} end
 # abstract type PTensor{V1,V2,V3,N,S} <: AbstractPTensor{S,N} end
 # abstract type PTensorComponent{V1,V2,V3,N,S} <: AbstractPTensorComponent{S,N} end
-
-# abstract type AbstractDyadicTensorComponent{S} end
-
-abstract type AbstractBasisChangeTensor{S1,S2} end
-
+abstract type PVector{E1,E2,E3,S} <: AbstractPVector{S} end
+abstract type PhysicsCoordinates{E1,E2,E3,S} <: AbstractPhysicsCoordinates{S} end
+abstract type BasisVector{E1,E2,E3,S} <: AbstractBasisVector{S} end
+abstract type BasisVectors{E1,E2,E3,S} <: AbstractBasisVectors{S} end
+abstract type UnitBasisVector{E1,E2,E3,S} <: AbstractUnitBasisVector{S} end
+abstract type UnitBasisVectors{E1,E2,E3,S} <: AbstractUnitBasisVectors{S} end
+abstract type BasisChangeComponent{E1,E2,E3,S} <: AbstractBasisChangeComponent{S} end
+abstract type MetricTensorComponent{E1,E2,E3,S} <: AbstractMetricTensorComponent{S} end
+abstract type TensorComponent{E1,E2,E3,S} <: AbstractTensorComponent{S} end
+abstract type PTensorComponent{E1,E2,E3,S} <: AbstractPTensorComponent{S} end
 abstract type AbstractTensor{S} <: AbstractCSTensor{S} end
 abstract type AbstractDiagonalTensor{S} <: AbstractCSTensor{S} end
 abstract type AbstractPTensor{S} <: AbstractCSTensor{S} end
 abstract type AbstractPDiagonalTensor{S} <: AbstractCSTensor{S} end
 abstract type AbstractMetricTensor{S} <: AbstractTensor{S} end
 abstract type AbstractCSMetrics{S} <: AbstractCSTensor{S} end
+abstract type MetricTensor{E1,E2,E3,S} <: AbstractMetricTensor{S} end
+abstract type Tensor{E1,E2,E3,S} <: AbstractTensor{S} end
+abstract type PTensor{E1,E2,E3,S} <: AbstractPTensor{S} end
+abstract type DiagonalTensor{E1,E2,E3,S} <: AbstractDiagonalTensor{S} end
+abstract type PDiagonalTensor{E1,E2,E3,S} <: AbstractPDiagonalTensor{S} end
+# abstract type AbstractDyadicTensorComponent{S} end
+
+abstract type AbstractBasisChangeTensor{S1,S2} end
+
+
 
 abstract type BasisChangeTensor{G1,G2,G3,S1,S2} <: AbstractBasisChangeTensor{S1,S2} end
 # abstract type AbstractRightContraction{S} <: AbstractComponentOperatorCS{S} end

@@ -71,7 +71,7 @@ macro add_coordinate_type(name)
 end
 
 function add_vectortype(blk, name, kwargs, s::String)
-    push!(blk.args, :(abstract type $(Symbol(s)){E1,E2,E3,S} <: $(Symbol("Abstract" * s)){S} end))
+    # push!(blk.args, :(abstract type $(Symbol(s)){E1,E2,E3,S} <: $(Symbol("Abstract" * s)){S} end))
     pp = [:E1, :E2, :E3]
     fields = [(k, p) for ((k, v), p) in zip(kwargs, pp)]
     sfields = [k for ((k, v), p) in zip(kwargs, pp)]
