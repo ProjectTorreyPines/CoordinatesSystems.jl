@@ -16,7 +16,7 @@ gₖₖ =  1
 "
 
 using CoordinatesSystems
-import CoordinatesSystems: Tensor, ParallelFieldAlignedCS, PoloidalFieldAlignedCS, RightContraction, ⊗, PVector, →, UnitBasisVectors, NormalizationMetric, ⋅, AbstractBasisVectors, ArrayGenerator, PhysicsComponentVector, BasisVectors, CartesianCS, CylindricalCS, MetricTensor
+import CoordinatesSystems: Tensor, ParallelFieldAlignedCS, PoloidalFieldAlignedCS, RightContraction, ⊗, PVector, →, UnitBasisVectors, NormalizationMetric, ⋅, AbstractBasisVectors, ArrayGenerator, PVector, BasisVectors, CartesianCS, CylindricalCS, MetricTensor
 
 arr_gen = ArrayGenerator(1)
 
@@ -25,9 +25,9 @@ arr_gen = ArrayGenerator(1)
 
 φ = [π / 4]
 r = [2.0]
- 𝐞ǁ = cos.(φ) * 𝐞̂.x + sin.(φ) * 𝐞̂.ϕ
- 𝐞ʌ = -sin.(φ) * 𝐞̂.x + cos.(φ) * 𝐞̂.ϕ
- 𝐞⊥ = 𝐞̂.y
+𝐞ǁ = cos.(φ) * 𝐞̂.x + sin.(φ) * 𝐞̂.ϕ
+𝐞ʌ = -sin.(φ) * 𝐞̂.x + cos.(φ) * 𝐞̂.ϕ
+𝐞⊥ = 𝐞̂.y
 
 𝐮 = BasisVectors{ParallelFieldAlignedCS}(𝐞ǁ, 𝐞⊥, 𝐞ʌ)
 𝐮̂ = UnitBasisVectors(𝐮)
@@ -46,8 +46,6 @@ d = 5.0
 𝐯 = 𝐛̂(c, d, 0.0)
 𝐰 = 𝐛̂(a, b, 0.0)
 ⋅(𝐱, 𝐯, Λ̅̅) == c * cos(φ) * a - sin(φ) * d * a + b * sin(φ) * d + b * cos(φ) * c
-
-𝐩 = PVector(𝐯, Λ̅̅)
 
 T̅̅ = 𝐯 ⊗ 𝐰
 𝐭 = -(T̅̅ ⋅ 𝐯)
