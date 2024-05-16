@@ -35,7 +35,7 @@
 
 # right contraction 
 # ⋅(g::AbstractCSTensor{S}, v::AbstractCSVector{S}, args...) where {S} = RightContraction((Dot(getproperty(g, fn), v) for fn in propertynames(g))...)
-⋅(v1::CSVector{Missing,U,V,S}, v2::CSVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,V,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+⋅(v1::CSVector{Missing,U,V,S}, v2::CSVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,V,U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 # ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 # ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 # ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
@@ -44,11 +44,11 @@
 ⋅(v1::CSVector{T,T,T,S}, v2::CSVector{U,U,U,S}) where {S,T<:Union{Real},U<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
 ⋅(v1::UArray, v2::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v1[index...] * ⋅(v, g, index...)
-⋅(v1::UArray, v2::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}) where {N,G1,G2,G3,S} = v1 .* ⋅(v2, g)
+⋅(v1::UArray, v2::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}) where {G1,G2,G3,S} = v1 .* ⋅(v2, g)
 
 # ⋅(v::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v[index...] * ⋅(v, g, index...)
-⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:UArray,U<:UArray} = @views getfield(v1, 1) .* getfield(v2, 1) .+ getfield(v1, 2) .* getfield(v2, 2) .+ getfield(v1, 3) .* getfield(v2, 3)
-⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:Union{Real},U<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
+⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:UArray} = @views getfield(v1, 1) .* getfield(v2, 1) .+ getfield(v1, 2) .* getfield(v2, 2) .+ getfield(v1, 3) .* getfield(v2, 3)
+⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
 # --- outer product ---- #
 ⊗(𝐞̂₁::AbstractCSVectors{S}, 𝐞̂₂::AbstractCSVectors{S}) where {S} = outer_product(𝐞̂₁, 𝐞̂₂)

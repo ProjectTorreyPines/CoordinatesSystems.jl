@@ -4,7 +4,7 @@ using OrderedCollections
 
 export Component, Coordinate, CoordinatesSystem, BasisVectors, UnitBasisVectors, PVector, PTensor, ⊗, ⋅, MetricTensor, Jacobian, Divergence
 
-generate_coordinate_systems = true
+generate_coordinate_systems = false
 
 include("array_generators.jl")
 include("coordinates_systems.jl")
@@ -105,7 +105,7 @@ function Base.show(io::IO, v::AbstractBasisVectors{S}) where {S}
     end
 end
 
-Base.show(io::IO, c::AbstractCSVector) where {S} = print(io, getfield(c, 1), " ", get_vector_sdoc(c, 1), " + ", getfield(c, 2), " ", get_vector_sdoc(c, 2), " + ", getfield(c, 3), " ", get_vector_sdoc(c, 3))
+Base.show(io::IO, c::AbstractCSVector) = print(io, getfield(c, 1), " ", get_vector_sdoc(c, 1), " + ", getfield(c, 2), " ", get_vector_sdoc(c, 2), " + ", getfield(c, 3), " ", get_vector_sdoc(c, 3))
 
 get_vector_sdoc(v::AbstractUnitBasisVector, c) = "𝐞̂_$(get_component_name(v,c))"
 get_vector_sdoc(v::AbstractCSVector, c) = "𝐞_$(get_component_name(v,c))"
