@@ -30,6 +30,7 @@ build_symbolic_function(expr, args...;) = SymbolicFunction(expr, args, build_fun
 expand_derivatives(v::V) where {S,V<:AbstractCSVector{S}} = get_base_type(V)((getproperty(v, fn) isa Missing ? missing : expand_derivatives(getproperty(v, fn), true) for fn in fieldnames(V))...)
 build_symbolic_function(v::V, args...) where {S,V<:AbstractCSVector{S}} = get_base_type(V)((getproperty(v, fn) isa Missing ? missing : build_symbolic_function(getproperty(v, fn), args...) for fn in fieldnames(V))...)
 compute!(v::V, args...) where {S,V<:Union{AbstractCSVectors{S},AbstractCSVector{S},AbstractCSTensor{S}}} = get_base_type(V)((getproperty(v, fn) isa Missing ? missing : compute!(getproperty(v, fn), args...) for fn in fieldnames(V))...)
+compute!(v::V, a, b, c) where {S,E1<:UnitBasisVector{<:Union{Float64,Array}, <:Any, <:Any,S},E2,E3,V<:UnitBasisVectors{E1,E2,E3,S}} = sum((f * c for (f,c) in zip([a,b,c],components(v))))
 compute!(f::RuntimeGeneratedFunctions.RuntimeGeneratedFunction, args...) = Float64(f(args))
 
 BasisVectors{S}(𝐑::AbstractCSVector, v::Vector{Num}) where {S} = BasisVectors{S}((build_symbolic_function(expand_derivatives(Differential(v_)(𝐑)), v) for v_ in v)...)

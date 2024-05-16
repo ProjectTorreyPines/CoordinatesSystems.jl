@@ -14,8 +14,8 @@ UArray{D} = Array{Float64,D}
 
 
 
-ComponentVector{E1,E2,E3,S} = Union{BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PVector{E1,E2,E3,S}}
-# ComponentVectors{E1,E2,E3,S} = Union{UnitBasisVectors{E1,E2,E3,S},PVectors{E1,E2,E3,S}}
+CSVector{E1,E2,E3,S} = Union{BasisChangeComponent{E1,E2,E3,S},UnitBasisVector{E1,E2,E3,S},PVector{E1,E2,E3,S},PTensorComponent{E1,E2,E3,S},TensorComponent{E1,E2,E3,S}}
+CSVectors{E1,E2,E3,S} = Union{UnitBasisVectors{E1,E2,E3,S},BasisVectors{E1,E2,E3,S}}
 
 PhysicsCoordinates1D{V1,S} = PhysicsCoordinates{V1,Missing,Missing,S} where {V1,S}
 PhysicsCoordinates2D{V1,V2,S} = PhysicsCoordinates{V1,V2,Missing,S} where {V1,V2,S}
@@ -29,17 +29,18 @@ include("symbolics.jl")
 Tensor{S}(arr_gen::ArrayGenerator) where {S} = Tensor{S}(TensorComponent{S}(arr_gen), TensorComponent{S}(arr_gen), TensorComponent{S}(arr_gen))
 TensorComponent{S}(arr_gen::ArrayGenerator) where {S} = TensorComponent{S}(arr_gen(), arr_gen(), arr_gen())
 
-# cs_dic = Dict()
-# cs_dic[:default] = CartesianCS
-# cs_dic[:parallel_fluxaligned] = ParallelFieldAlignedCS
-# cs_dic[:poloidal_fluxaligned] = PoloidalFieldAlignedCS
+cs_dic = Dict()
+cs_dic[:default] = CartesianCS
+cs_dic[:parallel_fluxaligned] = ParallelFieldAlignedCS
+cs_dic[:poloidal_fluxaligned] = PoloidalFieldAlignedCS
+
 arr_gen = ArrayGenerator(0)
 UnitBasisVectors(S::Type{<:CoordinatesSystem}) = UnitBasisVectors(S, ArrayGenerator(0))
 BasisVectors(S::Type{<:CoordinatesSystem}, arr_gen::ArrayGenerator) = BasisVectors{S}(BasisVector{S}(arr_gen(; fill=1), arr_gen(; fill=0), arr_gen(; fill=0)), BasisVector{S}(arr_gen(; fill=0), arr_gen(; fill=1), arr_gen(; fill=0)), BasisVector{S}(arr_gen(; fill=0), arr_gen(; fill=0), arr_gen(; fill=1)))
 UnitBasisVectors(S::Type{<:CoordinatesSystem}, arr_gen::ArrayGenerator) = UnitBasisVectors{S}(UnitBasisVector{S}(arr_gen(; fill=1), arr_gen(; fill=0), arr_gen(; fill=0)), UnitBasisVector{S}(arr_gen(; fill=0), arr_gen(; fill=1), arr_gen(; fill=0)), UnitBasisVector{S}(arr_gen(; fill=0), arr_gen(; fill=0), arr_gen(; fill=1)))
 UnitBasisVectors(u::AbstractBasisVectors{S}) where {S} = UnitBasisVectors{S}((UnitBasisVector(getproperty(u, fn)) for fn in propertynames(u))...)
 UnitBasisVector(u::AbstractCSVector{S}) where {S} = UnitBasisVector{S}((normalize(getproperty(u, fn), u) for fn in propertynames(u))...)
-normalize(v::T, u::ComponentVector{T,T,T,S}) where {T<:Union{UArray,Float64},S} = v ./ norm(u)
+normalize(v::T, u::CSVector{T,T,T,S}) where {T<:Union{UArray,Float64},S} = v ./ norm(u)
 normalize(v::SymbolicFunction, u::AbstractCSVector{S}) where {S} = v ./ norm(u)
 norm(u::AbstractCSVector{S}) where {S} = sqrt.(sum((getproperty(u, fn) .^ 2 for fn in propertynames(u))))
 MetricTensor(𝐞̂₁::AbstractBasisVectors) = MetricTensor(𝐞̂₁ ⊗ 𝐞̂₁)
@@ -56,7 +57,7 @@ AbstractBasisChangeComponent(𝐞̂₁::AbstractCSVector, 𝐞̂₂::AbstractCSV
 →(b1::UnitBasisVectors, b2::UnitBasisVectors) = BasisChangeTensor(b1, b2)
 
 
-abstract type Generic end
+
 
 
 
@@ -96,7 +97,7 @@ function Base.show(io::IO, mt::AbstractBasisChangeTensor{S1,S2}) where {S1,S2}
     end
 end
 
-components(v::Union{AbstractCSVector,AbstractCSVectors, AbstractCSTensor}) = (getproperty(v, fn) for fn in propertynames(v))
+components(v::Union{AbstractCSVector,AbstractCSVectors,AbstractCSTensor,CoordinatesSystem}) = (getproperty(v, fn) for fn in propertynames(v))
 function Base.show(io::IO, v::AbstractBasisVectors{S}) where {S}
     println(io, "basis vectors $S")
     for fn in propertynames(v)
@@ -133,7 +134,7 @@ struct MetricTensorJacobian{V}
 end
 
 
-struct CSMetrics{S,G<:AbstractMetricTensor{S},J<:MetricTensorJacobian,E<:AbstractBasisVectors{S},N<:AbstractUnitBasisVectors{S}} <: AbstractCSMetrics{S}
+struct CSMetrics{S,G<:AbstractMetricTensor{S},J,E<:AbstractBasisVectors{S},N<:AbstractUnitBasisVectors{S}} <: AbstractCSMetrics{S}
     cs::S
     g::G
     J::J
@@ -152,10 +153,9 @@ CSMetrics{S}(arr_gen::ArrayGenerator) where {S} = CSMetrics(UnitBasisVectors(S, 
 
 function CSMetrics(𝐞::AbstractBasisVectors{S}) where {S}
     g = MetricTensor(𝐞)
-    h = NormalizationMetric(g)
-    J = MetricTensorJacobian(det(g))
+    J = abs.(det(g))
     𝐞̂ = UnitBasisVectors(𝐞)
-    CSMetrics(S(), g, h, J, 𝐞, 𝐞̂)
+    CSMetrics(S(), g, J, 𝐞, 𝐞̂)
 end
 
 getfield_(v::Real) = v
@@ -194,42 +194,26 @@ end
 include("operators.jl")
 
 # iterator over cs
-# function Base.iterate(vars::CoordinatesSystem, state=1)
-#     state > length(vars) && return nothing
-#     return (getfield(vars, state), state + 1)
-# end
 
-# function Base.iterate(vars::PVector, state=1)
-#     state > length(vars) && return nothing
-#     return (getfield(vars, state), state + 1)
-# end
+function Base.iterate(vars::Union{AbstractCSObject,CoordinatesSystem}, state=1)
+    state > length(vars) && return nothing
+    return (getfield(vars, state), state + 1)
+end
 
-# function Base.iterate(vars::PTensor, state=1)
-#     state > length(vars) && return nothing
-#     return (getfield(vars, state), state + 1)
-# end
 
-# function Base.iterate(vars::PTensorComponent, state=1)
-#     state > length(vars) && return nothing
-#     return (getfield(vars, state), state + 1)
-# end
+Base.length(cs::T) where {T<:Union{AbstractCSObject,CoordinatesSystem}} = fieldcount(T)
 
-# Base.length(cs::T) where {T<:Union{PVector,PTensor,PTensorComponent}} = fieldcount(T)
-
-# Base.length(cs::T) where {T<:CoordinatesSystem} = fieldcount(T)
-
-# get_component_names(v::AbstractPTensor) = Base.IteratorsMD.flatten(((((Symbol(fn * "_" * fn2) for fn2 in propertynames(getproperty(v, fn)))...,) for fn in propertynames(v))...,))
+get_component_names(v::AbstractPTensor) = Base.IteratorsMD.flatten(((((Symbol(fn * "_" * fn2) for fn2 in propertynames(getproperty(v, fn)))...,) for fn in propertynames(v))...,))
 get_component_names(v::AbstractCSVector) = propertynames(v)
 get_component_names(v::CoordinatesSystem) = propertynames(v)
 get_component_names(v::Type{<:CoordinatesSystem}) = fieldnames(v)
 get_components(::AbstractCSVector{S}) where {S} = [s() for s in fieldtypes(S)]
 # get_components(::AbstractPVector{S,S,N}) where {S,N} = [s() for s in fieldtypes(S)]
-# get_components(::AbstractPTensor{S,N}) where {S,N} = [s() for s in fieldtypes(S)]
+get_components(::AbstractPTensor{S}) where {S} = [s() for s in fieldtypes(S)]
 # get_components(::AbstractPTensor, c::Component) = [c]
 # get_components(::AbstractPTensor, c::Tuple{Component,Component}) = [c]
 # get_components(::AbstractPTensorComponent{S,N}) where {S,N} = [s() for s in fieldtypes(S)]
 get_coordinates(cs::S) where {S<:CoordinatesSystem} = [Coordinate(s()) for s in fieldtypes(S)]
-Coordinate(c::Component) = Coordinate(get_component_name(c))
 export get_components
 
 
@@ -237,17 +221,22 @@ export get_components
 
 get_component(v::AbstractCSVector, c::Int64) = getfield(v, c)
 get_component_name(v::AbstractCSVector, c::Int64) = collect(propertynames(v))[c]
-
+get_component_name(::Type{C}) where {C<:Component} = get_component_name(C())
 get_component_name(c::Component)::Symbol = c.s
 get_coordinate_name(c::Coordinate)::Symbol = c.s
 
 get_component(v::AbstractCSObject, c::Component) = getproperty(v, c.s)
 get_coordinate(v::AbstractCSObject, c::Coordinate) = getproperty(v, c.s)
-
-Component(s::Symbol) = occursin("_", string(s)) ? Tuple(Component{s_}() for s_ in Symbol.(split(string(s), "_"))) : Component{s}()
+Component(s::Symbol) = occursin("_", string(s)) ? Tuple(GenericComponent{s_}(s_) for s_ in Symbol.(split(string(s), "_"))) : GenericComponent{s}(s)
 Component(s::Tuple{Symbol,Symbol}) = (Component(s[1]), Component(s[2]))
-Coordinate(s::Symbol) = occursin("_", string(s)) ? Tuple(Coordinate{s_}() for s_ in Symbol.(split(string(s), "_"))) : Coordinate{s}()
-Coordinate(s::Tuple{Symbol,Symbol}) = (Coordinate(s[1]), Coordinate(s[2]))
-Component(c::Coordinate{T}) where {T} = Component(get_coordinate_name(c))
-Coordinate(::Missing) = missing
+
+Component(cs, s::Symbol) = occursin("_", string(s)) ? Tuple(_Component(cs, s_) for s_ in Symbol.(split(string(s), "_"))) : _Component(cs, s)
+Component(cs, s::Tuple{Symbol,Symbol}) = (_Component(cs, s[1]), _Component(cs, s[2]))
+Coordinate(cs, s::Symbol) = occursin("_", string(s)) ? Tuple(_Coordinate(cs, s_) for s_ in Symbol.(split(string(s), "_"))) : _Coordinate(cs, s)
+Coordinate(cs, s::Tuple{Symbol,Symbol}) = (_Coordinate(cs, s[1]), _Coordinate(cs, s[2]))
+Component(cs, c::Coordinate{T}) where {T} = _Component(cs, c)
+Coordinate(cs, ::Missing) = missing
+_Coordinate(cs, s::Symbol) = Coordinate(getproperty(cs, s))
+_Component(cs, s::Symbol) = getproperty(cs, s)
+
 end

@@ -50,20 +50,23 @@ macro add_coordinate_type(name)
     name_component_field = Symbol(lowercase(string(name)))
     name_coordinate_field = Symbol(lowercase(string(name)))
     ex = quote
-        struct $name_component{T} <: Component{T}
+        struct $name_component{T,S} <: Component{T,S}
             s::Symbol
         end
-        struct $name_coordinate{T} <: Coordinate{T}
+        struct $name_coordinate{T,S} <: Coordinate{T,S}
             s::Symbol
         end
-        Component{$(QuoteNode(name_component_field))}() = $name_component{Generic}()
-        Coordinate{$(QuoteNode(name_coordinate_field))}() = $name_coordinate{Generic}()
-        $name_component(args...) = $name_component{Generic}(args...)
-        $name_coordinate(args...) = $name_coordinate{Generic}(args...)
-        $name_coordinate{T}() where {T} = $name_coordinate{T}($(QuoteNode(name_coordinate_field)))
-        $name_component{T}() where {T} = $name_component{T}($(QuoteNode(name_component_field)))
-        (c::$name_component{T})(E::Type) where {T} = $name_component{E}
-        (c::$name_coordinate{T})(E::Type) where {T} = $name_coordinate{E}
+        #Component{$(QuoteNode(name_component_field))}() = $name_component{Generic}()
+        Coordinate(::$name_component{T,S}) where {T,S} = $name_coordinate{T,S}()
+        Component(::$name_coordinate{T,S}) where {T,S} = $name_component{T,S}()
+        $name_component(s::Symbol) = $name_component{Generic}(s)
+        $name_coordinate(s::Symbol) = $name_component{Generic}(s)
+        $name_coordinate{T}(s::Symbol) where {T} = $name_coordinate{T,s}(s)
+        $name_component{T}(s::Symbol) where {T} = $name_component{T,s}(s)
+        $name_coordinate{T,s}() where {T,s} = $name_coordinate{T,s}(s)
+        $name_component{T,s}() where {T,s} = $name_component{T,s}(s)
+        (c::$name_component{T,S})(E::Type) where {T,S} = $name_component{E,S}
+        (c::$name_coordinate{T,S})(E::Type) where {T,S} = $name_coordinate{E,S}
         export $name_component, $name_coordinate
     end
     _write_coordinate_systems(ex)
@@ -129,7 +132,7 @@ function make_scalar_product!(blk)
         args = [:(getfield(v1, $(f[1]))[index...] * getfield(v2, $(f[1]))[index...] * getfield(getfield(g, $(f[1])), $(f[2]))[index...]) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
         args2 = [:(getfield($(get_symbol(f[1], f[2])), $(f[1]))[index...] * getfield($(get_symbol(f[2], f[1])), $(f[1]))[index...] * getfield(getfield(g, $(f[1])), $(f[2]))[index...]) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
         if length(args) > 0
-            push!(blk.args, :(⋅(v1::ComponentVector{U,U,U,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{G11,G12,G13,G22,G23,G33,S2,S1}, index::Vararg{Int64,N}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(⋅(v1::CSVector{U,U,U,S1}, v2::CSVector{U,U,U,S2}, g::BasisChangeTensor{G11,G12,G13,G22,G23,G33,S2,S1}, index::Vararg{Int64,N}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
             push!(blk.args, :(⋅(v11::U, v12::U, v13::U, v21::T, v22::T, v33::T, g::BasisChangeTensor{G11,G12,G13,G22,G23,G33,S2,S1}, index::Vararg{Int64,N}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},T<:UArray{N},S1,S2} = $(length(args2) > 1 ? Expr(:call, :+, args2...) : args2[1])))
 
         end
@@ -137,7 +140,7 @@ function make_scalar_product!(blk)
         args2 = [:(getfield($(get_symbol(f[1], f[2])), $(f[1])) .* getfield($(get_symbol(f[2], f[1])), $(f[1])) .* getfield(getfield(g, $(f[1])), $(f[2]))) for (f, i) in zip(f_iter, i_iter) if (G[i...] != :Missing)]
 
         if length(args) > 0
-            push!(blk.args, :(⋅(v1::ComponentVector{U,U,U,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{$G1,$G2,$G3,S1,S2}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = @views $(length(args) > 1 ? Expr(:call, :.+, args...) : args[1])))
+            push!(blk.args, :(⋅(v1::CSVector{U,U,U,S1}, v2::CSVector{U,U,U,S2}, g::BasisChangeTensor{$G1,$G2,$G3,S1,S2}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},S1,S2} = @views $(length(args) > 1 ? Expr(:call, :.+, args...) : args[1])))
             push!(blk.args, :(⋅(v11::U, v12::U, v13::U, v21::T, v22::T, v33::T, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,S2,S1}) where {N,G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:UArray{N},T<:UArray{N},S1,S2} = @views $(length(args2) > 1 ? Expr(:call, :.+, args2...) : args2[1])))
         end
     end
@@ -155,7 +158,7 @@ function make_scalar_product!(blk)
         G[1, 3] = G13
         args = [:(getfield(v1, $(f[1])) * getfield(v2, $(f[1])) * getfield(getfield(g, $(f[1])), $(f[2]))) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
         if length(args) > 0
-            push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{G$11,$G12,$G13,$G22,$G23,$G33,S2,S1}) where {G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:Real,T<:Real,S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(⋅(v1::CSVector{T,T,T,S1}, v2::CSVector{U,U,U,S2}, g::BasisChangeTensor{G$11,$G12,$G13,$G22,$G23,$G33,S2,S1}) where {G11<:$G11,G12<:$G12,G13<:$G13,G22<:$G22,G23<:$G23,G33<:$G33,U<:Real,T<:Real,S1,S2} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
         end
     end
 end
@@ -168,8 +171,8 @@ macro add_coordinates_system(args...)
     aargs, kwargs = convert_macro_kwargs(args)
     basename = string(aargs[1])
     name = aargs[1] * :CS
-    fields = [(k, v * "Component") for (k, v) in kwargs]
-    fieldtypes = [:($(v * "Component")()) for (k, v) in kwargs]
+    fields = [(k, Expr(:curly, v * "Component", :Generic, QuoteNode(k))) for (k, v) in kwargs]
+    fieldtypes = [:($(v * "Component")) for (k, v) in kwargs]
     blk = Expr(:block)
     # coordinate system
     struct_dic_cs = Dict(
@@ -280,40 +283,6 @@ macro add_scalar_product()
     make_scalar_product!(blk)
     _write_coordinate_systems(blk)
 end
-
-# macro add_compute_projection()
-#     !(generate_coordinate_systems) && return
-#     cs = collect(keys(coordinate_systems_dict))
-#     blk = Expr(:block)
-#     make_compute_projection!(blk)
-
-#     _write_coordinate_systems(blk)
-# end
-
-# function make_change_basis_tensor(cs1,cs2)
-
-#     pp = [:G11, :G12, :G13, :G22, :G23, :G33]
-#     pt = [:($(cs1[:name] * "BasisChangeComponent"){G11,G12,G13}),
-#         :($(cs1[:name] * "BasisChangeComponent"){G12,G22,G23}),
-#         :($(cs1[:name] * "BasisChangeComponent"){G13,G23,G33})]
-#     fields = [(f[1],p) for (f,p) in zip(cs2[:fields],pt)]
-
-
-#     #push!(pp, cs1[:name])
-#     struct_dic = Dict(
-#         :constructors => Any[],
-#         :mutable => false,
-#         :name => cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor",
-#         :params => pp,
-#         :fields => fields,
-#         :supertype => Expr(:curly, :BasisChangeTensor, :G11, :G12, :G13, :G22, :G23, :G33, cs1[:name], cs2[:name])
-#     )
-#     blk = Expr(:block)
-#     push!(blk.args,MacroTools.combinestructdef(struct_dic) )
-#     push!(blk.args, :(BasisChangeTensor{$(cs1[:name]),$(cs2[:name])}(args...; kw...) = $(cs1[:name] * "2" * cs2[:name] * "BasisChangeTensor")(args...; kw...)))
-#    return blk
-
-# end
 
 
 function make_change_basis_tensor(cs1, cs2)
@@ -455,15 +424,15 @@ end
 #         if S1 == S2
 #          args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...))) for (f,i) in zip(f_iter,i_iter) if (G[i...] != :Missing && f[1] == f[2])]
 #                 if length(args) > 0
-#                     push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,S1}, v2::ComponentVector{U,U,U,S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {U,T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#                     push!(blk.args, :(⋅(v1::CSVector{T,T,T,S1}, v2::CSVector{U,U,U,S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {U,T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
 
 #                 end
 #         else   
 #         args =[:($(Expr(:ref,:(v1.$(f[1])),index_field[d_field]...)) *  $(Expr(:ref,:(v2.$(f[2])),index_field[d_field]...)) * $(Expr(:ref,:(g.$(f[1]).$(f[2])),index_grid[d_grid]...))) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
 
 #           if length(args) > 0
-#             push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{T,T,T,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1},$(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
-#             push!(blk.args, :(⋅(v2::ComponentVector{T,T,T,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#             push!(blk.args,:(⋅(v1::CSVector{T,T,T,$S1}, v2::CSVector{T,T,T,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1},$(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#             push!(blk.args, :(⋅(v2::CSVector{T,T,T,$S2}, v1::CSVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}, $(index_args[d_field]...)) where {T<:UArray{$d_field}} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
 #         end
 #     end
 #         end
@@ -481,16 +450,16 @@ end
 #             G[1,3] = G13
 #     args =[:(v1.$(f[1]) * v2.$(f[2]) * g.$(f[1]).$(f[2])) for (f,i) in zip(f_iter,i_iter) if G[i...] != :Missing]
 #     if length(args) > 0
-#         push!(blk.args, :(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#         push!(blk.args, :(⋅(v1::CSVector{T,T,T,$S1}, v2::CSVector{U,U,U,$S2}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
 #         if S1 != S2
-#             push!(blk.args, :(⋅(v2::ComponentVector{U,U,U,$S2}, v1::ComponentVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#             push!(blk.args, :(⋅(v2::CSVector{U,U,U,$S2}, v1::CSVector{T,T,T,$S1}, g::BasisChangeTensor{$G11,$G12,$G13,$G22,$G23,$G33,$S2,$S1}) where {U,T<:Real} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
 #         end
 #     end
 # end
 
 #     if S1 == S2
 #         args =[:(v1.$(f) * (v2.$(f))) for (f) in f1]
-#         push!(blk.args,:(⋅(v1::ComponentVector{T,T,T,$S1}, v2::ComponentVector{U,U,U,$S2}) where {U,T} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+#         push!(blk.args,:(⋅(v1::CSVector{T,T,T,$S1}, v2::CSVector{U,U,U,$S2}) where {U,T} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
 #     end
 
 # end
@@ -514,12 +483,12 @@ function make_compute_projection!(blk)
         args = [:(v.$(f)[index...] * g.$(f)[index...]) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
 
         if length(args) > 0
-            push!(blk.args, :(compute_projection(v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}, index::Vararg{Int64,N}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(compute_projection(v::CSVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}, index::Vararg{Int64,N}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
         end
         args = [:(v.$(f) * g.$(f)) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
 
         if length(args) > 0
-            push!(blk.args, :(compute_projection(v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = @views @. $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(compute_projection(v::CSVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:UArray{N},S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = @views @. $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
         end
     end
     GG = [Float64, :Missing]
@@ -531,7 +500,7 @@ function make_compute_projection!(blk)
         args = [:(v.$(f)[index...] * g.$(f)[index...]) for (f, i) in zip(f_iter, i_iter) if G[i...] != :Missing]
 
         if length(args) > 0
-            push!(blk.args, :(compute_projection(v::ComponentVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:Float64,S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
+            push!(blk.args, :(compute_projection(v::CSVector{T,T,T,S2}, g::BasisChangeComponent{G1,G2,G3,S2}) where {N,T<:Float64,S1,S2,G1<:$G1,G2<:$G2,G3<:$G3} = $(length(args) > 1 ? Expr(:call, :+, args...) : args[1])))
         end
 
     end

@@ -15,33 +15,38 @@
 ⋅(v1::AbstractCSVector{S1}, v2::AbstractCSVector{S2}, g::BasisChangeTensor{G1,G2,G3,S1,S2}) where {G1,G2,G3,S1,S2} = ⋅(getfield(v1, 1), v2, getfield(g, 1)) .+ ⋅(getfield(v1, 2), v2, getfield(g, 3)) .+ ⋅(getfield(v1, 3), v2, getfield(g, 3))
 
 
-⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}) where {T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
+
+⋅(v1::CSVector{E1,Missing,Missing,S}, v2::CSVector{E1,Missing,Missing,S}, index::Vararg{Int64,N}) where {E1<:Array,S,N} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...]
+⋅(v1::CSVector{E1,E1,Missing,S}, v2::CSVector{E1,E1,Missing,S}, index::Vararg{Int64,N}) where {E1<:Array,S,N} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...]
+⋅(v1::CSVector{E1,E1,E1,S}, v2::CSVector{E1,E1,E1,S}, index::Vararg{Int64,N}) where {E1<:Array,S,N} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+
+⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}) where {T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 ⋅(v1::AbstractCSVector{S}, v2::AbstractCSVector{S}) where {S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 ⋅(t::T, v::V) where {S,T<:AbstractCSTensor{S},V<:AbstractCSVector{S}} = get_base_type(V)(getfield(t, 1) ⋅ v, getfield(t, 2) ⋅ v, getfield(t, 3) ⋅ v)
 
-#⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-#⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}) where {N,T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
+#⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+#⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}) where {N,T,U,V,S} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
 
-⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-#⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+⋅(v1::CSVector{Missing,U,V,S}, v2::CSVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+#⋅(v1::CSVector{Missing,U,V,S}, v2::CSVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 
-⋅(v1::ComponentVector{U,Missing,Missing,S}, v2::ComponentVector{V,Missing,Missing,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...]
+⋅(v1::CSVector{U,Missing,Missing,S}, v2::CSVector{V,Missing,Missing,S}, index::Vararg{Int64,N}) where {N,U,V,S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...]
 
-⋅(g::AbstractTensor{S}, v::AbstractCSVector{S}, args...) where {S} = RightContraction((Dot(getproperty(g, fn), v) for fn in propertynames(g))...)
-⋅(v1::ComponentVector{Missing,U,V,S}, v2::ComponentVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,V,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-# ⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-# ⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
-# ⋅(v1::ComponentVector{T,U,V,S}, v2::ComponentVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+# right contraction 
+# ⋅(g::AbstractCSTensor{S}, v::AbstractCSVector{S}, args...) where {S} = RightContraction((Dot(getproperty(g, fn), v) for fn in propertynames(g))...)
+⋅(v1::CSVector{Missing,U,V,S}, v2::CSVector{Missing,U,V,S}, index::Vararg{Int64,N}) where {N,V,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+# ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+# ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
+# ⋅(v1::CSVector{T,U,V,S}, v2::CSVector{T,U,V,S}, index::Vararg{Int64,N}) where {N,T<:UArray{N},U<:UArray{N},S} = getfield(v1, 1)[index...] * getfield(v2, 1)[index...] + getfield(v1, 2)[index...] * getfield(v2, 2)[index...] + getfield(v1, 3)[index...] * getfield(v2, 3)[index...]
 
-⋅(v1::ComponentVector{T,T,T,S}, v2::ComponentVector{U,U,U,S}) where {S,T<:UArray,U<:UArray} = @views getfield(v1, 1) .* getfield(v2, 1) .+ getfield(v1, 2) .* getfield(v2, 2) .+ getfield(v1, 3) .* getfield(v2, 3)
-⋅(v1::ComponentVector{T,T,T,S}, v2::ComponentVector{U,U,U,S}) where {S,T<:Union{Real},U<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
+⋅(v1::CSVector{T,T,T,S}, v2::CSVector{U,U,U,S}) where {S,T<:UArray,U<:UArray} = @views getfield(v1, 1) .* getfield(v2, 1) .+ getfield(v1, 2) .* getfield(v2, 2) .+ getfield(v1, 3) .* getfield(v2, 3)
+⋅(v1::CSVector{T,T,T,S}, v2::CSVector{U,U,U,S}) where {S,T<:Union{Real},U<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
-⋅(v1::UArray, v2::AbstractCSVector{S}, g::ComponentVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v1[index...] * ⋅(v, g, index...)
-⋅(v1::UArray, v2::AbstractCSVector{S}, g::ComponentVector{G1,G2,G3,S}) where {N,G1,G2,G3,S} = v1 .* ⋅(v2, g)
+⋅(v1::UArray, v2::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v1[index...] * ⋅(v, g, index...)
+⋅(v1::UArray, v2::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}) where {N,G1,G2,G3,S} = v1 .* ⋅(v2, g)
 
-# ⋅(v::AbstractCSVector{S}, g::ComponentVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v[index...] * ⋅(v, g, index...)
+# ⋅(v::AbstractCSVector{S}, g::CSVector{G1,G2,G3,S}, index::Vararg{Int64,N}) where {N,G1,G2,G3,S} = v[index...] * ⋅(v, g, index...)
 ⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:UArray,U<:UArray} = @views getfield(v1, 1) .* getfield(v2, 1) .+ getfield(v1, 2) .* getfield(v2, 2) .+ getfield(v1, 3) .* getfield(v2, 3)
 ⋅(v1::T, v2::AbstractCSVector{S}) where {S,T<:Union{Real},U<:Union{Real}} = getfield(v1, 1) * getfield(v2, 1) + getfield(v1, 2) * getfield(v2, 2) + getfield(v1, 3) * getfield(v2, 3)
 
@@ -70,7 +75,7 @@ outer_product(𝐞̂₁::AbstractCSVector{S}, 𝐞̂₂::AbstractCSVector{S}) wh
 
 
 
-det(a,b,c,d,e,f,g,h,i) = a * (e * i -f * h ) - b*(d*i-g*f) + c(d*h-e*g)
+det(a, b, c, d, e, f, g, h, i) = @. a * (e * i - f * h) - b * (d * i - g * f) + c * (d * h - e * g)
 det(g::AbstractCSTensor) = det(vcat(([c for c in components(r)] for r in components(g))...)...)
 
 

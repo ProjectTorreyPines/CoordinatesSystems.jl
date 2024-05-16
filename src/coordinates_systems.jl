@@ -66,9 +66,21 @@ abstract type BasisChangeTensor{G1,G2,G3,S1,S2} <: AbstractBasisChangeTensor{S1,
 
 # abstract type AbstractNormalizationMetric{S} end
 
+abstract type Generic end
+abstract type Component{T,S} end
+abstract type Coordinate{T,S} end
+struct GenericComponent{S} <: Component{Generic,S}
+s::Symbol
+end
 
-abstract type Component{T} end
-abstract type Coordinate{T} end
+struct GenericCoordinate{S} <: Component{Generic,S}
+    s::Symbol
+end
+
+# Component(s::Symbol) = GenericComponent{s}(s)
+
+
+# Coordinate{s}() where {s} = GenericCoordinate{s}(s)
 
 
 get_cs_type(::AbstractCSMetrics{S}) where {S} = S
@@ -80,8 +92,8 @@ include("code_generator.jl")
 # https://math.stackexchange.com/questions/2181886/divergence-of-the-product-of-a-scalar-and-a-tensor-fields
 # https://math.stackexchange.com/questions/1558913/divergence-theorem-applied-to-a-tensor-dotted-with-a-vector
 @add_coordinate_type Parallel
-@add_coordinate_type Toroidal
-@add_coordinate_type Crossfield
+@add_coordinate_type Toroidal 
+@add_coordinate_type Crossfield 
 @add_coordinate_type Diamagnetic
 @add_coordinate_type Poloidal
 @add_coordinate_type Azimuthal
