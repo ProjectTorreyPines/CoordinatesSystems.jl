@@ -32,14 +32,20 @@ isapprox(d(r_, 2.0, 3.0),4 * r_^2, atol=1e-14)
 The second usage is to perform vectorial calculations on mesh structures. 
 ```julia
 using CoordinatesSystems, Symbolics
-𝐞̂ = UnitBasisVectors(CartesianCS)
-@variables r Ψ θ
-𝐑 = r * cos(Ψ) * sin(θ) * 𝐞̂.x + r * sin(Ψ) * sin(θ) * 𝐞̂.y + r * cos(θ) * 𝐞̂.z
-𝐮 = BasisVectors{SphericalCS}(𝐑, [r, θ, Ψ])
-g̅̅ = MetricTensor(𝐮)
-r_ = 3.0
-θ_ = π / 3
-g = g̅̅(r_, θ_, 8.0)
-g.r.r == 1.0 && g.θ.θ == r_^2 && g.Ψ.Ψ == r_^2 * sin(θ_)^2
+nx = 100
+ny = 90
+arr_gen = ArrayGenerator(nx, ny)
+a = 1.0
+b = 2.0
+𝐮 = PVector{CartesianCS}(arr_gen; fill=a)
+𝐯 = PVector{CartesianCS}(arr_gen; fill=b)
+M = 𝐮 ⋅ 𝐯
+all(M .== 3 * a * b)
+
+A = rand(nx, ny)
+B = rand(nx, ny)
+C = rand(nx, ny)
+𝐮 = PVector{CartesianCS}(A, B, C)
+all(norm(𝐮) .== sqrt.(A .^ 2 .+ B .^ 2 .+ C .^ 2))
 ```
 
