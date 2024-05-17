@@ -76,9 +76,9 @@ outer_product(𝐞̂₁::AbstractCSVector{S}, 𝐞̂₂::AbstractCSVector{S}) wh
 
 norm(v1::T, v2::T) where {T<:AbstractCSVector} = ⋅(v1,v2)
 det(a, b, c, d, e, f, g, h, i) = @. a * (e * i - f * h) - b * (d * i - g * f) + c * (d * h - e * g)
-det(g::AbstractCSTensor) = toscalar(det(vcat(([c for c in components(r)] for r in components(g))...)...))
+det(g::AbstractCSTensor) = det(vcat(([c for c in components(r)] for r in components(g))...)...)
 toscalar(a) = a
-function toscalar(a::Vector) 
+function toscalar(a::Vector{<:SymbolicFunction}) 
 @assert length(a) == 1 
 a[1]
 end
