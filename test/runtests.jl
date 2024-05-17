@@ -2,11 +2,13 @@ using CoordinatesSystems, Symbolics
 using Test
 
 @testset "CoordinatesSystems.jl" begin
-    @testset "Smybolic" begin
+    @testset "Symbolic" begin
         include("symbolics.jl")
     end
     @testset "Operators" begin
-        include.(filter(contains(r".jl$"), readdir(joinpath(@__DIR__, "operators"); join=true)))
+        include("operators/divergence.jl")
+        include("operators/dot_product.jl")
+        include("operators/outer_product.jl")
     end
     @testset "Metric Tensor" begin
         include("metric_tensor.jl")

@@ -9,10 +9,10 @@ Author: Jerome Guterl (guterlj@fusion.gat.com)
 𝐑 = r * cos(φ) * 𝐞̂.x + r * sin(φ) * 𝐞̂.y + z * 𝐞̂.z
 𝐮 = BasisVectors{CylindricalCS}(𝐑, [r, φ, z])
 g̅̅ = MetricTensor(𝐮)
-r = 3.0
-g = g̅̅(r, 5.0, 8.0)
+r_ = 3.0
+g = g̅̅(r_, 5.0, 8.0)
 
-@test g.r.r == 1.0 && g.θ.θ == r^2 && g.z.z == 1.0
+@test g.r.r == 1.0 && g.θ.θ == r_^2 && g.z.z == 1.0
 
 
 𝐞̂ = UnitBasisVectors(CartesianCS)

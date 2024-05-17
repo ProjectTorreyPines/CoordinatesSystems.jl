@@ -76,14 +76,17 @@ outer_product(𝐞̂₁::AbstractCSVector{S}, 𝐞̂₂::AbstractCSVector{S}) wh
 
 norm(v1::T, v2::T) where {T<:AbstractCSVector} = ⋅(v1,v2)
 det(a, b, c, d, e, f, g, h, i) = @. a * (e * i - f * h) - b * (d * i - g * f) + c * (d * h - e * g)
-det(g::AbstractCSTensor) = det(vcat(([c for c in components(r)] for r in components(g))...)...)
-
-
+det(g::AbstractCSTensor) = toscalar(det(vcat(([c for c in components(r)] for r in components(g))...)...))
+toscalar(a) = a
+function toscalar(a::Vector) 
+@assert length(a) == 1 
+a[1]
+end
 struct DivergenceOperator{S,J,M}
     jacobian::J
     g::M
 end
-Divergence(g::AbstractMetricTensor{S}) where {S<:CoordinatesSystem} = DivergenceOperator{S}(abs(det(g)), g)
+Divergence(g::AbstractMetricTensor{S}) where {S<:CoordinatesSystem} = DivergenceOperator{S}(toscalar(abs.(det(g))), g)
 DivergenceOperator{S}(j::J, g::M) where {S,J,M} = DivergenceOperator{S,J,M}(j, g)
 
 ⋅(∇::DivergenceOperator{S,J,M}, 𝐯::AbstractCSVector{S}) where {S,J,M} = DivergenceOperation(∇, 𝐯)
