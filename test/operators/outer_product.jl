@@ -1,7 +1,4 @@
 
-𝐞̂ = UnitBasisVectors(CartesianCS)
-test_outer_product() = all(_test_outer_product() for i in 1:10)
-function _test_outer_product()
 a,b,c,e,f,g = rand(6)
 𝐯 = PVector{CartesianCS}(a, b, c)
 𝐰 = PVector{CartesianCS}(e, f, g)
