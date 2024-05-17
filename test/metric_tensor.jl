@@ -4,9 +4,6 @@ Author: Jerome Guterl (guterlj@fusion.gat.com)
  metric_tensor.jl (c) 2024
 =#
 
-using CoordinatesSystems,Symbolics
-
-function test_cylindrical_metric_tensor()
 𝐞̂ = UnitBasisVectors(CartesianCS)
 @variables r φ z
 𝐑 = r * cos(φ) * 𝐞̂.x + r * sin(φ) * 𝐞̂.y + z * 𝐞̂.z
@@ -15,14 +12,10 @@ g̅̅ = MetricTensor(𝐮)
 r = 3.0
 g = g̅̅(r, 5.0, 8.0)
 
-g.r.r == 1.0 && g.θ.θ == r^2 && g.z.z == 1.0
-end
+@test g.r.r == 1.0 && g.θ.θ == r^2 && g.z.z == 1.0
 
 
-
-function test_spherical_metric_tensor()
-    using CoordinatesSystems, Symbolics
-    𝐞̂ = UnitBasisVectors(CartesianCS)
+𝐞̂ = UnitBasisVectors(CartesianCS)
     @variables r Ψ θ
     𝐑 = r * cos(Ψ) * sin(θ) * 𝐞̂.x + r * sin(Ψ) * sin(θ) * 𝐞̂.y + r * cos(θ) * 𝐞̂.z
     𝐮 = BasisVectors{SphericalCS}(𝐑, [r, θ, Ψ])
@@ -30,6 +23,6 @@ function test_spherical_metric_tensor()
     r_ = 3.0
     θ_ = π / 3
     g = g̅̅(r_, θ_, 8.0)
-    g.r.r == 1.0 && g.θ.θ == r_^2 && g.Ψ.Ψ == r_^2 * sin(θ_)^2
-end
+    @test g.r.r == 1.0 && g.θ.θ == r_^2 && g.Ψ.Ψ == r_^2 * sin(θ_)^2
+
 
