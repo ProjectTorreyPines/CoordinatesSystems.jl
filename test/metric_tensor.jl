@@ -21,13 +21,15 @@ end
 
 
 function test_spherical_metric_tensor()
+    using CoordinatesSystems, Symbolics
     𝐞̂ = UnitBasisVectors(CartesianCS)
     @variables r Ψ θ
     𝐑 = r * cos(Ψ) * sin(θ) * 𝐞̂.x + r * sin(Ψ) * sin(θ) * 𝐞̂.y + r * cos(θ) * 𝐞̂.z
     𝐮 = BasisVectors{SphericalCS}(𝐑, [r, θ, Ψ])
     g̅̅ = MetricTensor(𝐮)
-    r_= 3.0
-    θ_ = π/3
+    r_ = 3.0
+    θ_ = π / 3
     g = g̅̅(r_, θ_, 8.0)
     g.r.r == 1.0 && g.θ.θ == r_^2 && g.Ψ.Ψ == r_^2 * sin(θ_)^2
 end
+

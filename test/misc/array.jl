@@ -1,21 +1,25 @@
-using CoordinatesSystems
-import CoordinatesSystems: ArrayGenerator
+using CoordinatesSystems, Test
+nx = 100
+ny = 90
+arr_gen = ArrayGenerator(nx,ny)
+a = 1.0
+b= 2.0
+𝐮 = PVector{CartesianCS}(arr_gen; fill= a)
+𝐯 = PVector{CartesianCS}(arr_gen; fill = b)
+M = 𝐮 ⋅ 𝐯
+@test all(M .== 3* a * b)
 
+A = rand(nx, ny)
+B = rand(nx, ny)
+C = rand(nx, ny)
+𝐮 = PVector{CartesianCS}(A,B,C)
+@test all(norm(𝐮) .== sqrt.(A .^ 2 .+ B .^ 2 .+ C .^ 2))
 
-arr_gen = ArrayGenerator(100,100)
-
-𝐞̂ = UnitBasisVectors(CartesianCS, arr_gen)
-
-φ = π / 4
-r = 2.0
-𝐞ᵣ = cos(φ) * 𝐞̂.x + sin(φ) * 𝐞̂.y
-𝐞ᵩ = -sin(φ) * 𝐞̂.x + cos(φ) * 𝐞̂.y
-𝐞ₖ = 𝐞̂.z
-PVector{CylindricalCS}()
-𝐮 = BasisVectors{CylindricalCS}(𝐞ᵣ, 𝐞ᵩ, 𝐞ₖ)
-𝐮̂ = UnitBasisVectors(𝐮)
-g̅̅ = MetricTensor(𝐮)
-Λ̅̅ = 𝐮̂ → 𝐞̂
-𝐱 = 𝐞̂(2.0, 1.0, 0.0)
-norm(𝐞ₖ)
-m = CSMetrics(𝐞̂)
+# PVector{CylindricalCS}()
+# 𝐮 = BasisVectors{CylindricalCS}()
+# 𝐮̂ = UnitBasisVectors(𝐮)
+# g̅̅ = MetricTensor(𝐮)
+# Λ̅̅ = 𝐮̂ → 𝐞̂
+# 𝐱 = 𝐞̂(2.0, 1.0, 0.0)
+# norm(𝐞ₖ)
+# m = CSMetrics(𝐞̂)

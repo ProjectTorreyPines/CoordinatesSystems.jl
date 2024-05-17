@@ -16,4 +16,7 @@ include("symbolics.jl")
         @test test_spherical_metric_tensor()
         @test test_cylindrical_metric_tensor()
     end
+    @testset "Array" begin
+        include("array.jl")
+    end
 end

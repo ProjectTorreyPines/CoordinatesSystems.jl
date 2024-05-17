@@ -36,6 +36,7 @@ compute!(f::RuntimeGeneratedFunctions.RuntimeGeneratedFunction, args...) = Float
 BasisVectors{S}(𝐑::AbstractCSVector, v::Vector{Num}) where {S} = BasisVectors{S}((build_symbolic_function(expand_derivatives(Differential(v_)(𝐑)), v) for v_ in v)...)
 PVector{S}(v1::Num, v2::Num, v3::Num, v::Array{<:Num}) where {S} = PVector{S}((build_symbolic_function(v_, v) for v_ in [v1, v2, v3])...)
 BasisVectors{S}(v1::Num, v2::Num, v3::Num, v::Array{<:Num}) where {S} = BasisVectors{S}((build_symbolic_function(expand_derivatives(Differential(v_)(PVector{CartesianCS}(v1, v2, v3))), v) for v_ in v)...)
+PVector{S}(arr_gen::AbstractArrayGenerator; kw...) where {S} = PVector{S}((arr_gen(;kw...) for v_ in 1:3)...)
 
 get_base_type(::Type{A}) where {A} = Base.typename(A).wrapper
 for op in (:+, :-, :*, :/, :^, :sqrt,:abs)

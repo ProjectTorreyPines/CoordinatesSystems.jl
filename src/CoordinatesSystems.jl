@@ -2,7 +2,8 @@ module CoordinatesSystems
 using MacroTools
 using OrderedCollections
 
-export Component, Coordinate, CoordinatesSystem, BasisVectors, UnitBasisVectors, PVector, PTensor, ⊗, ⋅, MetricTensor, Jacobian, Divergence
+export Component, Coordinate, CoordinatesSystem, BasisVectors, UnitBasisVectors, PVector, PTensor, ⊗, ⋅, norm
+export MetricTensor, Jacobian, Divergence, ArrayGenerator, PrefilledArrayGenerator
 
 generate_coordinate_systems = false
 
@@ -42,7 +43,7 @@ UnitBasisVectors(u::AbstractBasisVectors{S}) where {S} = UnitBasisVectors{S}((Un
 UnitBasisVector(u::AbstractCSVector{S}) where {S} = UnitBasisVector{S}((normalize(getproperty(u, fn), u) for fn in propertynames(u))...)
 normalize(v::T, u::CSVector{T,T,T,S}) where {T<:Union{UArray,Float64},S} = v ./ norm(u)
 normalize(v::SymbolicFunction, u::AbstractCSVector{S}) where {S} = v ./ norm(u)
-norm(u::AbstractCSVector{S}) where {S} = sqrt.(sum((getproperty(u, fn) .^ 2 for fn in propertynames(u))))
+norm(u::AbstractCSVector{S}) where {S} = sqrt.(⋅(u,u))
 MetricTensor(𝐞̂₁::AbstractBasisVectors) = MetricTensor(𝐞̂₁ ⊗ 𝐞̂₁)
 MetricTensor(T̅̅::AbstractTensor{S}) where {S} = MetricTensor{S}((MetricTensorComponent(getproperty(T̅̅, fn)) for fn in propertynames(T̅̅))...)
 MetricTensorComponent(T̅::AbstractTensorComponent{S}) where {S} = MetricTensorComponent{S}((getproperty(T̅, fn) for fn in propertynames(T̅))...)
