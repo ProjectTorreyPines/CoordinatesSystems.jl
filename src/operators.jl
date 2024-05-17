@@ -56,6 +56,7 @@
 outer_product(𝐞̂₁::AbstractCSVectors{S}, 𝐞̂₂::AbstractCSVectors{S}) where {S} = Tensor{S}((TensorComponent{S}(((getproperty(𝐞̂₂, fn) ⋅ getproperty(𝐞̂₁, fn2)) for fn in propertynames(𝐞̂₁))...) for fn2 in propertynames(𝐞̂₁))...)
 outer_product(𝐞̂₁::AbstractCSVector{S}, 𝐞̂₂::AbstractCSVector{S}) where {S} = Tensor{S}((TensorComponent{S}(((getproperty(𝐞̂₂, fn) * getproperty(𝐞̂₁, fn2)) for fn in propertynames(𝐞̂₁))...) for fn2 in propertynames(𝐞̂₁))...)
 
+×(v1::T, v2::T) where {T<:AbstractCSVector} = get_base_type(T)(getfield(v1, 2) * getfield(v2, 3) - getfield(v1, 3) * getfield(v2, 2), - getfield(v1, 1) * getfield(v2, 3) + getfield(v1, 3) * getfield(v2, 1),getfield(v1, 1) * getfield(v2, 2) - getfield(v1, 2) * getfield(v2, 1))
 
 # AbstractOperator = Union{typeof(-),RightContraction}
 

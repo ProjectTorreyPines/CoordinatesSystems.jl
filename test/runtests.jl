@@ -9,6 +9,7 @@ using Test
         include("operators/divergence.jl")
         include("operators/dot_product.jl")
         include("operators/outer_product.jl")
+        include("operators/cross_product.jl")
     end
     @testset "Metric Tensor" begin
         include("metric_tensor.jl")

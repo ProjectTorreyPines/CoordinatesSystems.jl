@@ -2,7 +2,7 @@ module CoordinatesSystems
 using MacroTools
 using OrderedCollections
 
-export Component, Coordinate, CoordinatesSystem, BasisVectors, UnitBasisVectors, PVector, PTensor, ⊗, ⋅, norm
+export Component, Coordinate, CoordinatesSystem, BasisVectors, UnitBasisVectors, PVector, PTensor, ⊗, ⋅, norm, ×
 export MetricTensor, Jacobian, Divergence, ArrayGenerator, PrefilledArrayGenerator, components
 
 generate_coordinate_systems = false

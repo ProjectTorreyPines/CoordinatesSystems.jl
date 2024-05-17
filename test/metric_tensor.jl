@@ -20,6 +20,7 @@ g = g̅̅(r_, 5.0, 8.0)
     𝐑 = r * cos(Ψ) * sin(θ) * 𝐞̂.x + r * sin(Ψ) * sin(θ) * 𝐞̂.y + r * cos(θ) * 𝐞̂.z
     𝐮 = BasisVectors{SphericalCS}(𝐑, [r, θ, Ψ])
     g̅̅ = MetricTensor(𝐮)
+    simplify(g̅̅)
     r_ = 3.0
     θ_ = π / 3
     g = g̅̅(r_, θ_, 8.0)
