@@ -74,7 +74,7 @@ outer_product(𝐞̂₁::AbstractCSVector{S}, 𝐞̂₂::AbstractCSVector{S}) wh
 # ComponentOperator{S,O}(v1::AbstractComponentOperatorCS{S}, v2::AbstractComponentOperatorCS{S}) where {S,O} = ComponentOperator{S,O}((GenericOperator{O}(getproperty(v1,fn),getproperty(v2,fn)) for fn in propertynames(v1))...)
 # ComponentOperator{S,O}(v1::AbstractComponentOperatorCS{S}, v2::Missing) where {S,O} = ComponentOperator{S,O}((GenericOperator{O}(getproperty(v1, fn), missing) for fn in propertynames(v1))...)
 
-
+import LinearAlgebra: norm
 norm(v1::T, v2::T) where {T<:AbstractCSVector} = ⋅(v1,v2)
 det(a, b, c, d, e, f, g, h, i) = @. a * (e * i - f * h) - b * (d * i - g * f) + c * (d * h - e * g)
 det(g::AbstractCSTensor) = det(vcat(([c for c in components(r)] for r in components(g))...)...)

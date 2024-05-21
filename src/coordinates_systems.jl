@@ -84,6 +84,7 @@ end
 
 
 get_cs_type(::AbstractCSMetrics{S}) where {S} = S
+get_cs_type(::AbstractCSVector{S}) where {S} = S
 ε = 1e-14
 threshold_metric_component(a::Float64; ε=1e-14) = abs(a) < ε ? missing : a
 threshold_metric_component(a::Any; ε=1e-14) = args

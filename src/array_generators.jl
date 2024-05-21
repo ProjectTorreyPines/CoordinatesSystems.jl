@@ -47,6 +47,7 @@ PrefilledArrayGenerator(v::T; backend=CPUBackend()) where {T<:Real} = PrefilledA
 (arr_gen::PrefilledArrayGenerator{B,T,D,DIM})(; kw...) where {T,D,B<:Backend,DIM} = B(arr_gen.value)
     
 function (arr_gen::ArrayGenerator{B,T,D,DIM})(; fill=0.0, extra_dim=0, type=missing) where {T,D,B<:Backend,DIM}
+    
     if type isa Missing
         type = T
     end
