@@ -4,6 +4,7 @@ authors = ["Jerome Guterl"]
 version = "1.0.0-DEV"
 
 [deps]
+DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
 Format = "1fa38f19-a742-5d3f-a2b9-30dd87b9d5f8"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
@@ -11,10 +12,11 @@ OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
+DocumenterTools = "0.1.20"
 Format = "1"
+MacroTools = "0.5"
 OrderedCollections = "1"
 Symbolics = "5"
-MacroTools = "0.5"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

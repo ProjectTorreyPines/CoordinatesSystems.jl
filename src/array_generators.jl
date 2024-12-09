@@ -61,8 +61,10 @@ function (arr_gen::ArrayGenerator{B,T,D,DIM})(; fill=0.0, extra_dim=0, type=miss
             push!(dims, 1)
         end
     end
-    if length(dims) == 1 && dims[1] == 0
-        return B(T(fill))
+    if (length(dims) == 1 && dims[1] == 0) || length(dims) == 0
+        arr = Array{T,0}(undef)
+        arr[] = fill
+        return B(arr)
     else
         if applicable(zero, type)
             arr = zeros(type, dims...)
