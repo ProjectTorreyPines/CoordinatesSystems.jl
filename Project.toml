@@ -1,7 +1,7 @@
 name = "CoordinatesSystems"
 uuid = "46fde914-2a1c-4f77-9b2f-1c21d94fe0f1"
 authors = ["Jerome Guterl"]
-version = "1.0.0-DEV"
+version = "1.0.1"
 
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
