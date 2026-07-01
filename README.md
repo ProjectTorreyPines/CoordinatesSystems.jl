@@ -1,3 +1,7 @@
+This repository has been archived and is no longer maintained.
+The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+It should not be used in production systems.
+
 # CoordinatesSystems
 
 [![CI](https://github.com/ProjectTorreyPines/CoordinatesSystems.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/ProjectTorreyPines/CoordinatesSystems.jl/actions/workflows/CI.yml)
